@@ -557,7 +557,12 @@ Gui.Nav.prototype = {
 		this.trimButton = this.createButton('trim','Trim trailing whitespace');
 		} //#endif
 		this.trimButton.onclick = function(){
-			this.gui.setValue(this.gui.zeon.wtree.map(function(o){ if (o.isTrailingWhitespace) return ''; return o.value; }).join(''));
+			var filtered = this.gui.zeon.wtree;
+			var n = filtered.length;
+			while (n-- && (filtered[n].isWhite || filtered[n].name == 13/*asi*/) && filtered[n].name != 10/*lineterminator*/) filtered[n] = '';
+			filtered = filtered.map(function(o){ if (o.isTrailingWhitespace) return ''; return o.value; });
+
+			this.gui.setValue(filtered.join(''));
 		}.bind(this);
 		this.toolMenu.appendChild(this.trimButton);
 	},

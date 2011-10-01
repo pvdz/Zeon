@@ -17,17 +17,7 @@
 // tofix: clause should break: function a(){switch(x){case y:if(data)return; else break;case y:oops;case z:nope;}}
 // tofix: why is third x just a string? 	var x = 5;	process(x);	x += y;
 // tofix: trimming whitespace at the end of the file doesnt do anything
-/*Uncaught wtf no tracking object? 1896 zeon.js
 
- * function f(){
-	try {
-		
-	} catch(e){
-		function g*(P{;
-	}
-
-}
- */
 
 // H certain operators are static too (void, typeof on primitives), take into account with static expressions
 // M if some token is an array and .push or .unshift is called on on it, maybe add the type to the array types too...
@@ -2227,7 +2217,10 @@ Zeon.prototype = {
 		if (token.name == 10/*lineterminator*/) {
 			// mark all whitespace sequentially before it as trailing whitespace
 			var pos = token.tokposw;
-			while (pos-- && this.wtree[pos].name == 9/*whitespace*/) this.wtree[pos].isTrailingWhitespace = true;
+			while (pos--) {
+				if (this.wtree[pos].name == 9/*whitespace*/) this.wtree[pos].isTrailingWhitespace = true;
+				else if (this.wtree[pos].name != 13/*asi*/) break; // asis are also kind of whitespace, at least in the source
+			}
 		}
 
 		// dead statements...
