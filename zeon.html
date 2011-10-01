@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Zeon.js</title>
+
+		<meta charset="utf-8" /> 
+		<meta name="description" lang="en-us" content="Zeon.js, a free online JavaScript code insight editor" /> 
+		<meta name="keywords" lang="en-us" content="JavaScript Code Insight Statical Analysis Editor Zeon" /> 
+		<meta name="robots" content="index,follow">
+
+		<link rel="icon" type="image/png" href="http://zeonjs.com/zeonify.png"> 
+		<link rel="shortcut icon" href="http://zeonjs.com/zeonify.png" /> 
+		<!--
+		<script>
+			setTimeout(function(){
+				var ga = document.createElement('script');
+				ga.async = true;
+				ga.defer = true;
+				ga.src = 'http://www.google-analytics.com/ga.js';
+				ga.onload = function(){try{_gat._getTracker('UA-19882353-2')._trackPageview();}catch(e){window.console&&console.log("ga fail :'( ");};};
+				var s = document.getElementsByTagName('script')[0];
+				s.parentNode.insertBefore(ga, s);
+			}, 10);
+		</script>
+		-->
+
+		<style>
+			html, body, div, span, h1 { margin: 0; padding: 0; border: 0; }
+			.arch {
+				-webkit-border-radius: 0 0 50% 50%;
+				border-radius: 0 0 50% 50%;
+				width: 200%;
+				height: 150px;
+				margin-left: -100%;
+				background-color: #ff80ff;
+				position: relative;
+				-webkit-box-shadow: 2px 2px 20px #737373;
+				box-shadow: 2px 2px 20px #737373;
+				cursor: default;
+				text-shadow: 0.2em 0.5em 0.1em #600, -0.3em 0.1em 0.1em #060, 0.4em -0.3em 0.1em #006;
+			}
+			.arch>h1 {
+				font-family: monospace;
+				font-size: 150px;
+				position: absolute;
+				left: 60%;
+				bottom: 0px;
+				letter-spacing: 30px;
+				color: white; 
+			}
+			.arch>h1>span {
+				font-size: 50px;
+				letter-spacing: normal;
+			}
+			
+			.content {
+				font-family: Verdana;
+				font-size: 15px;
+				margin: 20px auto 0 auto;
+				width: 700px;
+			}
+			
+			textarea { 
+				width: 600px; 
+				height: 350px; 
+				margin: 0 auto;
+				
+				font-family: monospace;
+				font-size: 13px;
+				line-height: 15px;
+			}
+			
+			dt { font-weight: bold; }
+			dd { margin-bottom: 10px; }
+			code { background-color: #eee; padding: 1px; }
+			pre { background-color: #eee; border: 1px solid black; padding-top: 20px; padding-left: 5px; }
+		</style>
+	</head>
+	<body>
+		<header class="arch">
+			<h1>
+				ZEON<span>.js</span>
+			</h1>
+		</header>
+		<div class="content">
+			<p>
+				Zeon.js is a tool that helps you find problems in your JavaScript / ECMAScript.
+			</p>
+			<p>
+				It uses a custom parser and statical analysis to bring your attention to possible problems.
+			</p>
+			<p>
+				Use this <a href="#" id="bookmarklet">zeonify</a> bookmarklet to enable Zeon.js for any textarea on any page!
+			</p>
+			<textarea>
+setTimeout(function () {
+    var m = new Image(); m.src="images/modal.gif";
+    var trail = $("#trail"),
+    function westward() {
+      var l = trail.width();
+      wagon.css({ left: l }).animate({ left: -150 }, 20000, westward);
+    }
+    westward("Ho!");
+  
+  
+  
+    wagon.click(dysentery);
+    $("#overlay").live("click", function(e) {
+      $("audio")[0].pause();
+      $("#overlay").remove();
+      $("#smallbox").remove();
+    });
+
+  }, 10);</textarea>
+  			<p>
+  				Zeon.js is a proof of concept analyze tool by Peter van der Zee, &copy; April 2011, <a href="http://qfox.nl">qfox.nl</a>.
+  			</p>
+			<p>
+				The poc was built and developed using Chrome(11). It will also (at least kind of) work in Firefox 4, IE 9 and Safari 5. It won't work on Opera and probably not on mobile. Chrome is recommended for larger scripts because it seems to be faster at the time of writing.
+			</p>
+			<p>
+				Please note that at least for the time being this software is closed and may not be used in third party software without my explicit consent. If you'd like to use my js parser or this tool in another project you can always just contact me through twitter at <a href="http://twitter.com/kuvos">@kuvos</a>.
+			</p>
+			<p>
+				<a href="info.html">More details here</a>
+			</p>
+
+			<script src="zeparser/unicodecategories.js"></script>
+			<script src="Ast.js"></script>
+			<script src="zeparser/Tokenizer.js"></script>
+			<script src="zeparser/ZeParser.js"></script>
+			<script src="Gui.js"></script>
+			<script src="Gui.Config.js"></script>
+			<script src="Gui.Nav.js"></script>
+			<script src="Gui.Filter.js"></script>
+			<script src="Gui.Jslint.js"></script>
+			<script src="Zeon.js"></script>
+			<script>
+				var gui = Gui.start(true);
+				gui.enableDnD();
+			</script>
+
+<!--
+			<script src="zeon-bookmarklet.js"></script>
+			<script>
+				new function(){
+					// now get the js we just included as text to create the bookmarklet
+					// note that it should just be cached so no extra downloads:)
+					var xhr = new XMLHttpRequest;
+					xhr.onreadystatechange = function () {
+						if (xhr.readyState == 4 || xhr.readyState=='complete') {
+							if (xhr.status == 200) {
+								var bm = document.getElementById('bookmarklet');
+								bm.setAttribute('href', 'javascript:'+xhr.responseText);
+							} else {
+								throw "File request problem (code: "+xhr.status+")!"; // most likely file not found...
+							}
+						}
+					};
+					xhr.open("GET", 'zeon-bookmarklet.js', false);
+					xhr.send(null); // GET's have no payload
+				};
+			</script>
+-->
+			
+		</div>
+	</body>
+</html>

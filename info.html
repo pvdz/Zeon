@@ -1,0 +1,845 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Zeon.js details</title>
+
+		<meta charset="utf-8" /> 
+		<meta name="description" lang="en-us" content="Zeon.js, a free online JavaScript code insight editor" /> 
+		<meta name="keywords" lang="en-us" content="JavaScript Code Insight Statical Analysis Editor Zeon" /> 
+		<meta name="robots" content="index,follow">
+
+		<link rel="icon" type="image/png" href="http://zeonjs.com/zeonify.png"> 
+		<link rel="shortcut icon" href="http://zeonjs.com/zeonify.png" /> 
+
+		<style>
+			html, body, div, span, h1 { margin: 0; padding: 0; border: 0; }
+			.arch {
+				-webkit-border-radius: 0 0 50% 50%;
+				border-radius: 0 0 50% 50%;
+				width: 200%;
+				height: 150px;
+				margin-left: -100%;
+				background-color: #ff80ff;
+				position: relative;
+				-webkit-box-shadow: 2px 2px 20px #737373;
+				box-shadow: 2px 2px 20px #737373;
+				cursor: default;
+				text-shadow: 0.2em 0.5em 0.1em #600, -0.3em 0.1em 0.1em #060, 0.4em -0.3em 0.1em #006;
+			}
+			.arch>h1 {
+				font-family: monospace;
+				font-size: 150px;
+				position: absolute;
+				left: 60%;
+				bottom: 0px;
+				letter-spacing: 30px;
+				color: white; 
+			}
+			.arch>h1>span {
+				font-size: 50px;
+				letter-spacing: normal;
+			}
+			
+			.content {
+				font-family: Verdana;
+				font-size: 15px;
+				margin: 20px auto 0 auto;
+				width: 700px;
+			}
+
+			dt { font-weight: bold; }
+			dd { margin-bottom: 10px; }
+			code { background-color: #eee; padding: 1px; }
+			pre { background-color: #eee; border: 1px solid black; padding-top: 20px; padding-left: 5px; }
+		</style>
+	</head>
+	<body>
+		<header class="arch">
+			<h1>
+				ZEON<span>.js</span>
+			</h1>
+		</header>
+		<div class="content">
+			<h1>
+				<a href="http://zeonjs.com">Zeon</a>
+			</h1>
+			<p>
+				This tool will give you as much feedback about js as possible. It does this by static analysis and immediate visual feedback. Zeon works purely on the client side (in your browser) using a handwritten js parser, written in js. The parser is fast enough to process large scripts in real-time at acceptable speeds.
+			</p>
+			<p>
+				There are many things that can be reported. Not all of them will be equally important, but most of them could be a sign of possible trouble in your code. Pretty much all the (relevant) warnings from <a href="http://jslint.org">JSLint</a> are also in this project, and many many more.
+			</p>
+			<h2>Errors and warnings</h2>
+			<p>
+				The parser will try to report errors as detailed as possible. This is not always the case. Sometimes an error is an open end and pretty much anything could follow. But most of the time a certain character is missing from a syntactic structure (like a parenthesis from a statement header) and this is easy to report. All errors are marked with a red circle, most of the time at the appropriate position. Every now and then you'll have to go a little forward or backwards to get to the actual error position. Use the navigation to see the actual error message.
+			</p>
+			<p>
+				The warnings and messages are displayed inline in the code. Most of them appear as small circles in the top-left corner of whatever caused the warning to appear. Typing is shown through colored lines under various variables. Of course, regular syntax highlighting is also applied. Missing semi-colons which would be substituted by ASI are noted as small red squares.
+			</p>
+			<h2>
+				Variables
+			</h2>
+			<p>
+				Whenever you use a variable before declaring it, you'll see a warning. Using a variable that's not been declared at all causes a warning. Double declarations do too. Shadowing might be a sign of a problem so you'll see a warning for that too.
+			</p>
+			<h2>
+				Scope lookup
+			</h2>
+			<p>
+				A certain set of bubbles are caused by scope lookups. Any variable will have a bubble that tells you how many scope lookups js would have to do to get to that variable. Note that you'll always at least do one scope lookup. If the variable is not defined, the bubble will be red. Variables that are not defined, and not known to be global or part of the language, will be striked out.
+			</p>
+			<h2>
+				Type inference
+			</h2>
+			<p>
+				There is some type inference going on. It's not perfect yet, but already goes a long way. The inference takes most assignments into account, for as far as the asignee type(s) are determinable of course. And even though the return type for functions can be determined, this only happens in the last step of the process so the return type of function calls are not taken into account for variable typing. If the type of a sub expression can be determined, it will properly propagate through operators.
+			</p>
+			<h2>
+				Editor
+			</h2>
+			<p>
+				Zeon is also a minor editor. I say minor because I basically only did that which I required myself. Building an IDE in the browser is a major PITA and I'm not touching it much further beyond what I have. Tabbing is supported. Tabbing multiple lines in and out is too (!). Putting your cursor on a token with some meta information (like type) will show a pop up with more information.
+			</p>
+			<h2>
+				Menu
+			</h2>
+			<p>
+				In the lower right corner, the big Z cannot be missed, you'll find the menu. This menu gives you access to four things. Information, navigation, tools and configuration. I would say toolination, but that wouldn't make sense.
+			</p>
+			<p>
+				The information is pretty basic right now. Just the size of the document and the number of lines. I do want to add the current position and selected size, but that's not in right now :)
+			</p>
+			<p>
+				Navigation is a powerful tool of going through your code and looking at potential problems quickly. Where most other (external) tools force you to go back and forward between the code and the analyze results, Zeon allows you to just click next. Or previous. Or just click the number to go to that result. You can also click on some of the titles in then menu-nav to get a filtered list of unique results.
+			</p>
+			<p>
+				There are also a few tools available from the menu.
+			</p>
+			<h3>
+				Beautify and minify
+			</h3>
+			<p>
+				 The beautifier can take any valid piece of code and generate properly indented code from it. It will remove the comments though, something I intend to fix in a future release.
+			</p>
+			<p>
+				The minifier will do the exact opposite, it will remove all whitespace and comments for as far as syntactically legal. It will also reduce variable names, unless you disabled that in the config. The config also contains an option to replace semi's with a newline (unless that would not cause ASI), idea courtesy of Fabian Jakobs (<a href="http://twitter.com/fjakobs">@fjakobs</a>).
+			</p>
+			<p>
+				The minifier will not rewrite code (like <a href="http://marijnhaverbeke.nl/uglifyjs">uglifyjs</a> or <a href="http://closure-compiler.appspot.com/home">the closure compiler</a> do). That's something I do want to investigate later, but haven't yet.
+			</p>
+			<h3>
+				Raw parse tree
+			</h3>
+			<p>
+				You can also look at the raw parse tree in textual form, if you can make sense of it. Since the current internal representation of the "parse tree" is just a set of objects and arrays with properties for information, the shown parse tree is simple though explicit. Just keep in mind that this is all Zeon needs to do most of its magic.
+			</p>
+			<h3>
+				Remove Zeon
+			</h3>
+			<p>
+				You can remove this Zeon instance from the page and attempt to restore the textarea to it's former state. Will work in most cases, but there are some styles (like border) that are too much work to restore, so it might not always work very properly (whatever, right).
+			</p>
+			<h3>
+				Pragma processing
+			</h3>
+			<p>
+				You can process the pragma's in the current page. It will remove the pragma's and do what they're intended to do. 
+			</p>
+			<h3>
+				Profiling
+			</h3>
+			<p>
+				This is a tool that's just a proof of concept, since it needs real embedding in an app (or an extension that can catch script loads and replace them with a custom script). But the tool allows you to rewrite a certain script, add custom call methods to each statement, run the code and visually display hot code with color bars. You'll immediately get a sense of what is important in your code and what isn't. The current tool will just do the converting and add the boiler plate for displaying the results in Zeon inline. It relies on Zeon being loaded and handle to it globally available. So to use it, paste some script that can run on its own, run the transformator and run the result in the console of your browser in the current page.
+			</p>
+			<h3>
+				Maximize and minimize
+			</h3>
+			<p>
+				In the Z menu you can also maximize and minize Zeon with the plus button, and then schrink it with the minus button.
+			</p>
+			<h3>
+				Generate JSDocs
+			</h3>
+			<p>
+				You can let Zeon use its internal information about the current script and generate JSDocs from it. It will add JSDocs to functions and variables. If there was a prior JSDoc, it will copy the comments (but replace type information). It will also add the jspath of each function (not for variables). Variables are always a single <code>@var</code> line. If there were multiple vars in the declaration, one line for each var is added to the comment.
+			</p>
+			<h3>
+				Fix hoisting
+			</h3>
+			<p>
+				Hoisting is the concept of variables being declared (but not initialized) at the start of the function/script rather than the actual point of usage. Function declarations are the same except they do initialize at the top as well. This tool attempts to show you in what order your code is actually executed.
+			</p>
+			<p>
+				First it refactors all the <code>var</code> statements in your code and puts them at the top of a function or global scope. It will remove the original <code>var</code> keyword and any variable name that did not have an initializer (the assignment). This is perfectly equivalent to the original code and is a so called "best practice". Albeit a boyscouts one. Note that this operation can leave some weird indentation, but it tries as much as it can.
+			</p>
+			<p>
+				Optionally (config -- "<i>hoisting fix moves func decl to top</i>") it will also move function declarations to the top of the scope (but below variable declarations). This too is perfectly equivalent.
+			</p>
+			<h3>
+				Trim whitespace
+			</h3>
+			<p>
+				Removes all trailing whitespace from the current document. It's like taking out the trash.
+			</p>
+			<h3>
+				Inject calls
+			</h3>
+			<p>
+				Transforms the current code by injecting call to a function supply (through very simple prompt) to every statement. The argument will be a unique id for that statement, throughout the source code. This allows you to do some stuff for code coverage or statistics with your code. The transformed code is restructured (much like the beautifier) and loses all comments. The callback can currently not be specified. Both are things I intend to change in the future.
+			</p>
+			<h3>
+				Show branching
+			</h3>
+			<p>
+				This tool will take a function (any function in your current code) and derive all functions with a unique branching path through that function. So when you have an <code>if</code> statement, it will generate at least two functions; one with and one without the <code>if</code>. Careful though because with large scripts or many code paths this number increases exponentially and your browser might not be able to handle it. Although interesting, I've not found it very useful ;)
+			</p>
+			<p>
+				Be careful because big scripts with complex branching structures can explode the computations and resulting size. You're on your own here :)
+			</p>
+			<h3>
+				Extract method
+			</h3>
+			<p>
+				By <a href="http://twitter.com/cjno/status/96538232447180800">request</a> of Christian Johansen (<a href="http:/twitter.com/cjno">@cjno</a>) I've added the "<a href="http://www.refactoring.com/catalog/extractMethod.html">Extract Method</a>" tool you can find in Eclipse. The way it works in Zeon is you select a part of the code and press the button. Zeon will then generate a new function for you, containing the selected code. Any variable that was declared but not within the function will be added as a parameter to this new function. Any variable that you declare or was passed on will be returned as an array. If the array would only contain one element, only that element is returned instead. If it would be empty, the function does not explicitly return at all. After this function a function call is made with the same variables as those its expecting. This allows the function to integrate fluently. The generated call will also create any variables created inside the function and assign their return value from the array. You can obviously remove what you deem you don't need anymore. The resulting function and boiler plate will try to keep the entire code flow in tact. This tool might help you to refactor your code :)
+			</p>
+			<p>
+				Note that you can select snippets of code that will make no sense to refactor like this. For instance, you cannot go cross function and expect things to work fine. Having a <code>return</code>, <code>continue</code> or <code>break</code> in the selection will also not work properly. I could fix (using <code>try</code>/<code>catch</code> and labels) that but the resulting code would be quite useless so you'll have to do that yourslef ;) So always make sure your selection does not break something that pairs (like parenthesis, curly braces or square brackets). The tool will not even try to detect this, so no warnings.
+			</p>
+			<h3>
+				Disambiguate operators
+			</h3>
+			<p>
+				When you run this tool it will add parenthesis around any expression that might otherwise be ambiguous if you're not very familiar with <a href="https://developer.mozilla.org/en/JavaScript/Reference/operators/operator_precedence"></a>operator precedence</a>. This means that something like <code>a + b + c</code> becomes <code>(a + b) + c</code>. Likewise, <code>a + b * c</code> becomes <code>a + (b * c)</code>. And <code>a * b & c % d || !e % f</code> becomes <code>((a * b) & (c % d)) || (!e % f)</code>. So this tool shows you what the order of applying operators actually is when you execute it in js.
+			</p>
+			<h3>
+				To and From js string
+			</h3>
+			<p>
+				Converts js code to a valid js string. If you paste a js string (just the string with the quotes), you can convert that back to script. When converting from js string, it will remove the first and last character of the script (the quotes), so make sure there's no trailing whitespace.
+			</p>
+			<h3>
+				To bookmarklet
+			</h3>
+			<p>
+				Create a bookmarklet from the current code. Will not change the variable names so you can debug it. You can always first minify and then create the bookmarklet.
+			</p>
+			<h2>
+				Config
+			</h2>
+			<p>
+				The configuration allows you to toggle certain visual aids, warning messages and the way some of the tools work.
+			</p>
+			<h2>
+				Bookmarklet
+			</h2>
+			<p>
+				Drag this bookmarklet to your bookmark bar to enable Zeon for any textarea on any page when you click on it.
+			</p>
+			<h2>
+				Chrome Extension
+			</h2>
+			<p>
+				You can use this Zeon Chrome Extension to get all the script tags on a page and load them in Zeon. It should work on local files too, but I can't seem to get that to work.
+			</p>
+			<h2>
+				Warnings
+			</h2>
+			<p>
+				This is a list of messages that Zeon might throw at you. A lot of them were copied from JSLint (which is not as easy as it sounds..) and many more have been added since. Every message will have an explanation on when the message will be shown. The order is pretty random ;)
+			</p>
+			<dl>
+				<dt>"ASI"</dt>
+				<dd>Non-fatal missing semi-colon. Marked with a red marker (can be disabled). These are semi-colons js will automatically insert for you, but which is bad to rely on because you can run into problems when you think js will add one when it won't.</dd>
+				
+				<dt>"unused"</dt>
+				<dd>A variable that has been declared (either with <code>var</code> or as a function declaration, or both) but never actually been used. Why declare a variable if you won't use it?</dd>
+				
+				<dt>"missing block good"</dt>
+				<dd>A statement (like <code>if</code> or <code>while</code>) followed by another statement (<code>if (x) statement</code>) which is not wrapped in a block <code>{}</code>, but put on the same line as the previous statement.</dd>
+				
+				<dt>"missing block bad"</dt>
+				<dd>Same as before, but the next statement is put on the next line, which might cause way more confusion. Single line it or add a block.<dd>
+				
+				<dt>"empty statement"</dt>
+				<dd>A semi-colon without a body is an empty statement. They are not bad per se (in fact, they don't do anything) but this is to warn you for possible improper usage of semi-colons. Especially semi's after function declarations and blocks are useless and may be removed.</dd>
+				
+				<dt>"assignment in header"</dt>
+				<dd>Should be obvious. <code>if (x = 5) ...</code><dd>
+				
+				<dt>"weak comparison"</dt>
+				<dd>Douglas' favorite warning. This is what you'll see in most cases whenever you use <code>==</code> instead of <code>===</code> (or <code>!=</code> vs <code>!==</code>).<dd>
+				
+				<dt>"dangling underscore"</dt>
+				<dd>Whenever a variable ends with an underscore <code>_</code>.<dd>
+				
+				<dt>"dot and not can be confusing"</dt>
+				<dd>Using a dot or the negative character class in regular expressions: <code>/ab.c/</code> and <code>/ab[^c]d/</code><dd>
+				
+				<dt>"inc dec operator"</dt>
+				<dd>Using the pre- / postfix operator <code>++</code> and <code>--</code>, when you just as easily could have used <code>x += 1</code>.<dd>
+
+				<dt>"cannot inc/dec on call expression"</dt>
+				<dd>For doing silly stuff like <code>x()++</code></dd>
+				
+				<dt>"inc/dec only valid on vars"</dt>
+				<dd>The incremental and decremental operator is only valid on actual variables. This because it needs to store a value back in the variable. Even <code>(x,y)++</code> is invalid, because the comma fetches <code>y</code> so <code>++</code> can't get a reference anymore.</dd>
+							
+				<dt>"binary operator"</dt>
+				<dd>Whenever you use binary operators (<code>| & ^ ~</code>).<dd>
+				
+				<dt>"use dot access"</dt>
+				<dd>Whenever you do dynamic property access with a string literal that would be a valid identifier: <code>obj['foo']</code><dd>
+				
+				<dt>"continue only in loops"</dt>
+				<dd>The <code>continue</code> statement may only occur inside a loop.</dd>
+
+				<dt>"break needs loop or label"</dt>
+				<dd>The <code>break</code> statement may occur inside a loop and outside a loop. But (and only) outside of loops the statement requires a label.</dd>
+				
+				<dt>"return only in function"</dt>
+				<dd>The <code>return</code> statement is only allowed inside functions.</dd>
+
+				<dt>"flow statement"</dt>
+				<dd>Whenever you use <code>return</code>, <code>continue</code> or <code>break</code> in a context where it would not be allowed. Return can only be used in functions. Continue can only be used in loops. Break can only be used in loops or with an existing label within the required range.<dd>
+				
+				<dt>"trailing decimal"</dt>
+				<dd>Whenever you use a trailing dot in a number literal. Valid but silly and confusing.<dd>
+
+				<dt>"leading decimal"</dt>
+				<dd>Whenever you use a leading dot in a number literal. Valid but silly and confusing.<dd>
+				
+				<dt>"regex confusion"</dt>
+				<dd>Using the compound operator <code>/=</code> could lead to confusing with respect to regular expression literals.<dd>
+				
+				<dt>"number dot"</dt>
+				<dd>Using the dot operator on number literals is dangerous, even if you know why it is.<dd>
+				
+				<dt>"assignment bad"</dt>
+				<dd>I'm not sure how you can trigger this one. You have to mess up reeeeally bad to get to this point ;) Assigning to a function call, for instance. <code>f() = 5;</code><dd>
+				
+				<dt>"assignment this"</dt>
+				<dd>Yeah, don't do this.<dd>
+				
+				<dt>"bad string escapement"</dt>
+				<dd>There are only a hand full of characters that are actually valid. The rest is ignored. They are different from regex.<dd>
+				
+				<dt>"bad regex escapement"</dt>
+				<dd>There are only a hand full of characters that are actually valid. The rest is ignored. They are different from strings.<dd>
+				
+				<dt>"avoid hex"</dt>
+				<dd>Hexidecimal notation can be confusing to some people: <code>0x5F0</code><dd>
+				
+				<dt>"caller callee"</dt>
+				<dd>This is depricated and will throw errors in strict mode.<dd>
+				
+				<dt>"octal escape"</dt>
+				<dd>This is confusing and depricated, and throws errors in strict mode (starting a number literal with a zero, followed by at least one other digit): <code>0778</code><dd>
+				
+				<dt>"00"</dt>
+				<dd>It's pointless to add multiple zeroes when.<dd>
+				
+				<dt>"regexp call"</dt>
+				<dd>When calling a regular expression directly. Only firefox supported this and they removed that support, so there.<dd>
+				
+				<dt>"confusing plusses"</dt>
+				<dd>Doing silly stuff like <code>x + ++y;</code><dd>
+				
+				<dt>"confusing minusses"</dt>
+				<dd>Doing silly stuff like <code>x - --y;</code><dd>
+				
+<!--				<dt>"double bang"</dt>
+				<dd>Douglas doesn't like you to do <code>!!x</code>. Ask him why, I dare you.<dd>-->
+				
+				<dt>"control char"</dt>
+				<dd>Using control chars literally in a string can be dangerous in certain contexts. Use escapes characters or unicode escapes to substitute them.<dd>
+				
+				<dt>"unsafe char"</dt>
+				<dd>Using certain chars literally in a string can be dangerous in certain contexts. Use escapes characters or unicode escapes to substitute them.<dd>
+				
+				<dt>"invalid unicode escape in string"</dt>
+				<dd>When you start a unicode escape but don't properly finish it. <code>"foo\u0bar"</code><dd>
+				
+				<dt>"invalid hex escape in string"</dt>
+				<dd>When starting a hex escape but don't finish it. <code>"foo\xbeer"</code></dd>
+				
+				<dt>"catch var assignment"</dt>
+				<dd>The variable of a <code>catch</code> clause is technically put in its own scope. Don't assign to it because it's likely to break stuff eventually.<dd>
+				
+				<dt>"bad constructor"</dt>
+				<dd>Invoking <code>Object</code>, <code>String</code>, <code>Number</code>, <code>Boolean</code>, <code>Function</code>, <code>RegExp</code> or <code>Error</code> with new. Use their primitive/literal versions instead. For errors, just use your own error objects. <code>Function</code> is like using eval.<dd>
+				
+				<dt>"array constructor"</dt>
+				<dd>Invoking Array as a constructor is bad because it can be confusing. In almost all cases it will just create a new array with the parameters as items, but there is an edge case. If you only supply one argument and that argument is a number, a new empty (!) array with its <code>.length</code> set to that number will be created. The number is then discarded, so it does not appear in the array. That's why you should always just use <code>[]</code> to create arrays.</dd>
+				
+				<dt>"error constructor"</dt>
+				<dd>Error is a built in object. While not bad per se, you can throw anything you'd like. So why not create your own error objects. Or maybe even just throw plain strings for descriptive messages?</dd>
+
+				<dt>"very bad constructor"</dt>
+				<dd>Invoking <code>Math</code> or <code>JSON</code> with new.<dd>
+				
+				<dt>"Function is eval"</dt>
+				<dd>Calling <code>Function</code>.<dd>
+				
+				<dt>"function wrapped"</dt>
+				<dd>Douglas wants a specific way of wrapping anonymous function expressions. <code>(function(){}())</code> vs <code>(function(){})()</code>, although I think Zeon currently doesn't detect this properly.<dd>
+				
+				<dt>"document.write"</dt>
+				<dd>Go away.<dd>
+				
+				<dt>"iteration function"</dt>
+				<dd>Do not create functions inside a loop. This leads to closure problems.<dd>
+				
+				<dt>"empty block"</dt>
+				<dd>Silly.<dd>
+				
+				<dt>"eval"</dt>
+				<dd>Avoid whenever possible. Zeon ignores the presence of <code>eval</code> (since it's impossible to take it into account). If you use eval, Zeon's analysis might b0rk.<dd>
+				
+				<dt>"empty regex char class"</dt>
+				<dd>Using <code>[]</code> inside a regex.<dd>
+				
+				<dt>"fell through case"</dt>
+				<dd>Can lead to problems. If you do this anyways, add a comment stating so.<dd>
+				
+				<dt>"extra comma"</dt>
+				<dd>Two consecutive comma's lead to confusion and might be a typo. It also has bad support amongst (even slightly) older browsers.<dd>
+					
+				<dt>"trailing comma"</dt>
+				<dd>An object or array literal that ends with a comma (before the closing <code>}]</code>) is fine, but most slightly older browsers might not support it and simply throw a syntax error. If you're sure your targeted browsers support it, feel free to ignore this :)</dd>
+				
+				<dt>"double new"</dt>
+				<dd>Why would you want to do this?<dd>
+				
+				<dt>"double delete"</dt>
+				<dd>Why would you want to do this?<dd>
+				
+				<dt>"undefined"</dt>
+				<dd>This is not a program error ;) This is about undefined being a global variable and usage of it is relatively dangerous. Just compare to null instead.<dd>
+				
+				<dt>"duplicate objlit prop"</dt>
+				<dd>When doing <code>{x:1, x:2}</code>, the first <code>x</code> property is ignored (<code>x</code> will be <code>2</code>). This can be very valueable when defining prototype property of a large object.<dd>
+				
+				<dt>"comma screws ref"</dt>
+				<dd>Using something like <code>(1, x.y)</code> will screw up the context for <code>x.y</code>.<dd>
+				
+				<dt>"timer eval"</dt>
+				<dd>Passing on a string to setTimeout or setInterval effectively causes an eval.<dd>
+				
+				<dt>"group vars"</dt>
+				<dd>Douglas wants you to group variable declarations (at the top too, if at all possible).<dd>
+				
+				<dt>"func decl at top"</dt>
+				<dd>Function declarations should be at the top to prevent confusion with hoisting.<dd>
+				
+				<dt>"is label"</dt>
+				<dd>Just a heads up that this is currently interpreted by js as a label (not, for instance, a property name..).<dd>
+				
+				<dt>"math call"</dt>
+				<dd><code>Math()</code><dd>
+				
+				<dt>"new wants parens"</dt>
+				<dd><code>new Person;</code> is valid but confusing for people new to js.<dd>
+				
+				<dt>"missing radix"</dt>
+				<dd>Always supply the radix when calling <code>parseInt</code>.<dd>
+				
+				<dt>"nested comment"</dt>
+				<dd>Whenever <code>/*</code> is found in another comment.<dd>
+				
+				<dt>"new statement"</dt>
+				<dd>Starting a statement with <code>new</code>.<dd>
+				
+				<dt>"no delete vars"</dt>
+				<dd>Don't delete vars, only properties. If you want to delete globals, just delete properties from window.<dd>
+					
+				<dt>"silly delete construct"</dt>
+				<dd>Using delete twice in the same expression (where one delete would be part of the operand of the other delete).</dd>
+				
+				<dt>"delete not a function"</dt>
+				<dd>The <code>delete</code> keyword is actually an operator and doesn't require parenthesis. And since you can only (usefully) use <code>delete</code> on variables and properties of variables, it doesn't ever make sense to wrap them in parentheses while on the other hand possibly spreading confusion. So don't use parentheses after delete.</dd>
+				
+				<dt>"weird delete operand"</dt>
+				<dd>When using delete with a primitive, a reserved keyword or basically anything that doesn't start with a variable (and not covered by other warnings).</dd>
+				
+				<dt>"dont use __proto__"</dt>
+				<dd>Warns for <code>__proto__</code> property. Don't use it. Sure as hell don't rely on it.<dd>
+				
+				<dt>"empty switch"</dt>
+				<dd>Valid but stupid.<dd>
+				
+				<dt>"quasi empty switch"</dt>
+				<dd><code>switch</code> with empty clauses.<dd>
+				
+				<dt>'idle switch'</dt>
+				<dd><code>switch</code> with only a default clause. Might as well ditch the switch.</dd>
+				
+				<dt>"empty clause"</dt>
+				<dd>Adding a clause with no body. Can easily appear for simple fall through cases.<dd>
+				
+				<dt>"clause should break"</dt>
+				<dd>When a <code>switch</code> clause does not <code>return</code>, <code>continue</code>, <code>throw</code> or <code>break</code>.<dd>
+				
+				<dt>"switch is an if"</dt>
+				<dd>Single clause <code>switch</code>.<dd>
+				
+				<dt>"unwrapped for-in"</dt>
+				<dd>Always wrap the body of a <code>for</code>-<code>in</code> statement in a <code>if (obj.hasOwnProperty(key)) ...</code><dd>
+				
+				<dt>"in out of for"</dt>
+				<dd>There are very few real use cases for using the <code>in</code> operator outside of a for statement.<dd>
+				
+				<dt>"use {}"</dt>
+				<dd>When doing <code>new Object</code><dd>
+				
+				<dt>"use []"</dt>
+				<dd>When doing <code>new Array</code><dd>
+				
+				<dt>"double block"</dt>
+				<dd>Putting a block inside another block, <code>{ .. { ... } ... }</code><dd>
+				
+				<dt>"useless block"</dt>
+				<dd>Putting a block in a function body, <code>function(){ .. { .. } .. }</code><dd>
+				
+				<dt>"use capital namespacing"</dt>
+				<dd>When a constructor was detected whos name doesn't start with a capital.<dd>
+				
+				<dt>"constructor called as function"</dt>
+				<dd>Objects detected to be constructors (used <code>new</code> on them or accessed the <code>prototype</code> property), called as a regular function.<dd>
+				
+				<dt>"bad asi pattern"</dt>
+				<dd>Relying on ASI when the next token would be a opening parenthesis, <code>a\n(b)</code><dd>
+				
+				<dt>"unlikely typeof result"</dt>
+				<dd>Checking the result of typeof with a string that's not one of the standard ones.<dd>
+				
+				<dt>"weird typeof op"</dt>
+				<dd>When using a weird operator on the result of typeof, <code>typeof x > y</code><dd>
+				
+				<dt>"typeof always string"</dt>
+				<dd>When using <code>===</code> or <code>!==</code> where <code>==</code> or <code>!=</code> would be equally safe.<dd>
+				
+				<dt>"static expression"</dt>
+				<dd>An expression that only exists of primitives (and operators).<dd>
+				
+				<dt>"static condition"</dt>
+				<dd>Condition that only exists of primitives (and operators)<dd>
+					
+				<dt>"is dev relic"</dt>
+				<dd>Identifiers with development like names. Stuff like <code>console</code>, <code>debugger</code>, <code>foo</code>, ...</dd>
+
+				<dt>"pragma requires name parameter"</dt>
+				<dd>Most pragmas need at least one parameter. <code>//#define foo</code><dd>
+				
+				<dt>"pragma requires value parameter"</dt>
+				<dd>Some pragmas also need a second parameter. <code>//#macro foo bar</code><dd>
+				
+				<dt>"missing ifdef"</dt>
+				<dd>When encountering an elseifdef, elsedef or endif without having seen a leading ifdef.<dd>
+				
+				<dt>"missing inline"</dt>
+				<dd>When encountering an endline without having seen a leading inline.<dd>
+				
+				<dt>"pragma start missing end"</dt>
+				<dd>Incomplete ifdef chains.<dd>
+				
+				<dt>"macro name should be identifier"</dt>
+				<dd>Due to some limitations, macro names must be valid identifier names, or property access (so a dot is allowed). <code>//#macro foo.bar.baz.phoey this is fine</code>.<dd>
+
+				<dt>"useless multiple throw args"</dt>
+				<dd>Passing on multiple arguments to throw is useless because it only returns one (the last expressions of the expressions).</dd>
+
+				<dt>"unnecessary parentheses"</dt>
+				<dd>Using parentheses after operators or throw statements is silly and useless. Throw only returns one expression (so a group is useless). Using parentheses give the wrong impression that <code>delete</code> and <code>throw</code> might be functions.</dd>
+
+				<dt>"uninitialized value in loop"</dt>
+				<dd>When you create a variable (in or outside a loop) and you read from it in the loop before assigning to it, you could run into trouble. What if the variable becomes some value you did not expect, on the next iteration you might end up with an unexpected result. Always make sure you explicitly initialize your variables, even if it's just to <code>null</code>, or even <code>undefined</code>.</dd>
+				
+				<dt>"prop not declared on proto"</dt>
+				<dd>Encountered a property on a <code>this</code> keyword but did not find it explicitly declared on the prototype where it belonged to. It's wise to declare all properties on the prototype so that you know what to expect (and maybe even document them ;). This will not only help yourself, but also anyone else who has to read your code, to know what properties that object instance might get. This warning might generate a few false positives, still need to tweak this a little.</dd>
+				
+				<dt>"label not found"</dt>
+				<dd>Used a label which was not found in the label set where it must exist. Browsers should throw an error if labels are used but not defined since they won't know where to "jump" to.</dd>
+				
+				<dt>"duplicate label"</dt>
+				<dd>Declaring the same label name twice within the same label set.</dd>
+				
+				<dt>"unknown implicit global"</dt>
+				<dd>Using a global variable that hasn't been declared and was not hardcoded as being present by the specification or in the browser. This warning will not show if you declared the variable later in the same scope. This sometimes triggers false positives wrt browser variables.</dd>
+				
+				<dt>"known implicit global"</dt>
+				<dd>Using a global variable that is hardcoded to exist in either the specification (<code>parseInt</code>, <code>isNaN</code>) or to exist in the browser (<code>window</code>, etc). You can generally ignore these :) But sometimes...</dd>
+				
+				<dt>"useless parens"</dt>
+				<dd>A grouped expression with just one expression becomes a useless group. For instance <code>log((5));</code> is a useless group. The parentheses might as well not exist.</dd>
+				
+				<dt>"dead code"</dt>
+				<dd>Either code that cannot be reached due to a premature exit (by <code>return</code>, <code>throw</code>, <code>break</code> or <code>continue</code>) or an idle statement (a single primitive). Note that for the premature exits, these are checked in branching. So when you have an <code>if</code>/<code>else</code> the code following is only dead if both branches exit. Not if only one of them exits.</dd>
+				
+				<dt>"premature usage"</dt>
+				<dd>Using a variable before it's declaration. It's valid, but confusing. Try not to do this.</dd>
+				
+				<dt>"cannot call/apply that"</dt>
+				<dd>When encountering parenthesis directly following a primitive, object literal or array literal. Those cannot possibly be a valid call target. The exception might be regular expressions, but that's only supported in FireFox, and they're dropping that support (if they haven't already). So just don't.</dd>
+				
+				<dt>"func expr name is read-only"</dt>
+				<dd>You cannot assign a new value to the name of a function expresssion. So <code>var f = function name(){ name = 5; };</code> will not change the value of <code>name</code>. If you see this warning, you tried to change the name anyways and it should fail.</dd>
+				
+			</dl>
+			<h2>
+				Additional reporting
+			</h2>
+			<p>
+				There are a few things also being reported or taken into account.
+			</p>
+			<h3>
+				JSDoc
+			</h3>
+			<p>
+				One of them is JSDocs, albeit very basic right now. However, the type annotation for parameters and variables are taken into account when doing type inference. Whenever you lead a multi line comment with a <code>/**</code> it will also try to parse and markup the jsdoc. For syntax and more information on JSDoc see: <a href="http://code.google.com/intl/nl/closure/compiler/docs/js-for-compiler.html#types">Google Closure</a>, <a href="http://code.google.com/p/jsdoc-toolkit/">JSDoc toolkit</a> (and its <a href="http://code.google.com/p/jsdoc-toolkit/wiki/FAQ">wiki</a>). See also the auto generating of jsdocs.
+			</p>
+			<h3>
+				Labels
+			</h3>
+			<p>
+				Labels are completely taken into account, which gave me new insights to how they work. They are actually a quite complex tax on the language, but luckily this mostly applies to the grammar and not the usage. Zeon will properly warn you when you are inappropriately using labels, or when they would be required (for a break). Double declared labels or invalidly declared labels are marked as such.
+			</p>
+			<h3>
+				Dev relics
+			</h3>
+			<p>
+				As developers we sometimes leave our tools behind. When Zeon sees a developer relic, it will warn you for it. Stuff like <code>console.log</code> or <code>debugger</code> should not be left in production code.
+			</p>
+			<h3>
+				Empty statements
+			</h3>
+			<p>
+				Empty statements (when you add a semi colon where one was not required) are marked with an epsilon to inform you of it. They are hardly ever a problem and commonly added after function declarations or certain blocks.
+			</p>
+			<h3>
+				Dangerous naming
+			</h3>
+			<p>
+				Using property names or even variables that use names declared in the specification or commonly found in the browser will end up with a visual warning for them. Even though it's perfectly legal to do <code>obj.if = 5;</code>, it's really silly unless semantically would demand it.
+			</p>
+			<h3>
+				Dead code
+			</h3>
+			<p>
+				Dead code is also detected. When you return from both branches in an <code>if</code>-<code>else</code>, any code that follows will never be executed and is deemed to be "dead code". It will show a skull-and-bones sign before it. The detection is pretty solid, except for <code>try</code>-<code>catch</code>, where it might lead to imperfections (due to the dynamic nature of <code>catch</code>).
+			</p>
+			<h3>
+				Directives
+			</h3>
+			<p>
+				Directives, strings at the start of a function or your script, are marked with a green D. Note that <code>"strict mode"</code> is currently not taken into account. 
+			</p>
+			<h3>
+				Regular expressions
+			</h3>
+			<p>
+				Zeon will attempt to validate your regular expressions. On top of that you'll see grouping help when moving the caret inside a regular expression. That should at least help you to get grouping, class range and quantities correct.
+			</p>
+			<h3>Trailing whitespace</h3>
+			<p>
+				The only whitespace at the ending of a line is a line terminator. All trailing whitespace is marked red for easy destruction. You can also run the trimming tool to remove it all for you :)
+			</p>
+			<h3>
+				Ctrl+click
+			</h3>
+			<p>
+				When you hold the ctrl-key and click on a parenthesis or bracket Zeon will jump to the matching element. If you click on a variable, it will jump to first declaration of that variable (if any).
+			</p>
+			<h2>
+				JSPath
+			</h2>
+			<p>
+				A js document is a structured document. As such, you can define a system to traverse the source code to point to certain concepts. JSPath is something I came up with and is supposed to be the counter part to XPath for CSS. I think I need this system for a tighter type checking system in the future and it sounded like an interesting feature at the time.
+			</p>
+			<p>
+				There are only a handfull of basic data concepts you might want to care about. Such are variables, functions, objects and arrays. This system should allow you to navigate through the source code, given a certain path, to the correct part of the code.
+			</p>
+			<p>
+				There are two types of paths; absolute paths and named paths. The absolute paths can be proven to be unique for the source it was defined with. The named paths are usually unique, but can be easily proven to be not to. However, the named path is more user friendly.
+			</p>
+			<h3>
+				Scopes
+			</h3>
+			<p>
+				First of all, scopes are our basic thing. We denote a scope with a forward slash (<code>/</code>). Everything starts at the global scope, so every path starts with a forward slash. Note that <b>only</b> functions <i>(and catch variables)</i> get their own scope.
+			</p>
+			<h3>
+				Functions
+			</h3>
+			<p>
+				Functions are either denoted by a number surrounded by parenthesis in absolute paths. The number being the nth occurring function in the same scope, offsetting at zero. It may also be denoted as the name of the variable or property where that function was assigned to. This is not always the case, though. Note that the name of a <i>named function expression</i> is not used in this context. So
+			</p>
+			<pre>
+/(1)/
+/foo/
+			</pre>
+			<h3>
+				Objects and arrays
+			</h3>
+			<p>
+				Objects and arrays are denoted pretty much the same as functions, except we use curly braces (<code>{}</code>) for object literals and square brackets (<code>[]</code>) for array literals.
+			</p>
+			<p>
+				In the following snippets will show you the absolute and named paths for the last object of each snippet. Of course, the named snippet is ambiguous so should probably not be used in these contexts. They are meant to illustrate the difference.
+			</p>
+			<pre>
+var obj = {foo:6};
+obj = {};
+obj = {};
+obj = {foo:5};
+
+absolute jspath =&gt;
+/{3}.foo
+
+named jspath =&gt;
+/obj.foo
+
+var arr = [];
+arr = [];
+arr = [];
+
+absolute jspath =&gt;
+/[3]
+
+named jspath =&gt;
+/arr.5
+			</pre>
+			<p>
+				The order of objects and arrays (and functions) is determined by their opening token. So <code>var obj = { foo: {} };</code> has two objects. Since the start of the outer object comes before the start of the inner token, the outer token would be <code>/{0}</code> (or <code>/obj</code>) and the inner token <code>/{0}.{1}</code> (or <code>/{0}.foo</code> or <code>/obj.{1}</code> or <code>/obj.foo</code> ...).
+			</p>
+			<h3>
+				Inheritance
+			</h3>
+			<p>
+				It's common in the js world to shorten something that's going to be inherited from a constructor by putting a hash between the constructor and the property, rather than <code>.prototype.</code>. So does jspath. So <code>/Array.prototype.slice</code> becomes <code>/Array#slice</code>. That is, it simply replaces any occurrence of <code>.prototype.</code> with a hash (<code>#</code>). Yes, that could mean that whenever <code>prototype</code> was used as a property name but not an actual prototype object, this could be slightly counter intuitive. But in general, I don't think this will cause any problems.
+			</p>
+			<h3>
+				Catch scopes
+			</h3>
+			<p>
+				As mentioned before, the third type of scope in js is the catch scope. It's a bit of a special case because the only thing that can and will be logged in a catch scope is the actual catch variable. New local variables in a catch scope are still logged in the outer scope for the catch scope (in fact, the first outer scope that's not a catch scope). The only part important to remember here is that the catch variable is logged in its own scope. To denote this we use the exclamation mark (<code>!</code>) followed by a number (the nth catch clause in the same scope) and a forward slash for the scope.
+			</p>
+			<pre>
+function foo(){ try {} catch(e) {} }
+/{0}/!0/e
+/foo/!0/e
+			</pre>
+			<h3>
+				Properties
+			</h3>
+			<p>
+				Properties of objects are prefixed with the jspath of the object (which may be another property) and a dot. If a name would be invalid as an identifier or property in js (like numbers or spaces), simply quote them with single or double quotes. In case the name contains quotes, only escape the quotes if they are the same type used to quote the name with a backslash. Always escape a backslash (when part of the name).
+			</p>
+			<pre>
+/foo.bar
+/{0}.bar
+
+/foo."bar baz"
+/foo.'bar\'baz'.poo
+/foo."bar\\\"baz"
+			</pre>
+			<p>
+				When an object literal has a property that's also an object literal, and you want to use the absolute path, the dot is still required: <code>/{0}.{1}.foo</code>
+			</p>
+			<p>
+				If an object literal has a certain property defined twice or more, it will always refer to the last occurrence of this name.
+			</p>
+			<h2>
+				Pragmas
+			</h2>
+			<p>
+				I'm currently adding pragma support to Zeon. This is a proof of concept for now. Since js does not support any pragmas natively, support has to be "hacked" in. So for now, any pragma has to be added as a single line comment like this: //#define. There may be no space between //, # or the pragma keyword. For brevity, the leading // will be left out in the docs below.
+			</p>
+			<h3>
+				Defines
+			</h3>
+			<p>
+				Defines make it easy to create code that targets specific platforms or product versions (debug, test, release).
+			</p>
+			<p>
+				A define does or does not exist. You can create one with the #define pragma. Simply stating #define FOO will create FOO and makes it be defined. Whenever you have an #ifdef FOO pragma, it's contents will only be left intact if the define actually exists. Otherwise it is removed. You can also add #elseifdef and #elsedef to this pragma. The #ifdef pragma must always end with a #endif, regardless of any of the other two were used in between. 
+			</p>
+			<p>
+				The pragma process will always remove any //#define comment as well as all //#ifdef, //#elseifdef, //#elsedef and //#endif comments and the entire (source text) line they appear in. This allows you for some initialization or branching code while developing. Additionally, only the ifdef bodies are kept which were indeed defined (and when no ifdef existed, the elsedef body is kept if it exists. Example:
+			</p>
+			<pre>
+var FOO = false; //#define FOO
+
+if (false) { //#ifdef BAR
+i_am_removed();
+} else if (FOO) { //#elseifdef FOO
+i_will_remain();
+} else { //#elsedef
+i_will_be_gone_because_another_branch_was_ok();
+} //#endif
+			</pre>
+			<p>
+			Becomes:
+			</p>
+			<pre>
+i_will_remain();
+			</pre>
+			<h3>
+			Macros
+			</h3>
+			<p>
+			The #macro pragma allows you to replace certain tokens with pretty much anything else. The main use case is replacing constants with their actual value, although other use cases exist. Note that only variable names and property name-chains are possible candidates for this (eg. it will never replace an occurrence in a comment, or string).
+			</p>
+			<p>
+			The pragma process will remove the //#pragma comment and anything that preceeded it on that line. This allows you to define placeholders in js for the constant or whatever.
+			</p>
+			<p>
+			Example:
+			</p>
+			<pre>
+var FOO = 5; //#macro FOO 5
+alert(FOO);
+
+var constants = {
+	BAR: 1, //#macro BAR 1
+	BAZ: 2, //#macro BAZ 2
+	WORLD: 3 //#macro WORLD 3
+};
+alert(constants.BAR, constants.BAZ, constants.WORLD);
+			</pre>
+			<p>
+			Becomes:
+			</p>
+			<pre>
+alert(5);
+
+alert(1, 2, 3);
+			</pre>
+			<h3>Inlining</h3>
+			<p>
+				The #inline pragma will replace all the instances of the given token with the body of the pragma. Just like macros, only variable names and property chains can be replaced. Unlike macros, the <b>entire line</b> of the match will be removed. This also counts for the line of the pragma header and footer. This allows you to do initialization and calling of the function. Since it's very difficult or impossible to determine what you would or would not want to have replaced, we simply remove the entire line. See examples for (hopefully) more clarity.
+			</p>
+			<pre>
+function foo(){//#inline foo
+	debug("foo");
+	stuff = log(bar);
+return stuff; }//#endline
+
+function bar(){
+	stuff = foo(this,is,"foo",bogus,foooo); // and also foo
+}
+			</pre>
+			<p>
+				Becomes
+			</p>
+			<pre>
+function bar(){
+	debug("foo");
+	log(bar);
+}
+			</pre>
+			<p>
+				So note that only the actual function call is replaced, none of the other "occurrences" were replaced, because they were not identifiers. The original function is completely stripped.
+			</p>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,1183 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Zeon console</title>
+		<style>
+			#dbg { position: absolute; top: 0; left: 350px; }
+			
+			textarea {
+				white-space: pre; 
+				font-family: monospace; 
+				line-height: 20px; 
+				font-size: 12px; 
+			
+				box-sizing: border-box;
+				margin: 0; 
+				overflow: auto; 
+				border: 1px solid black;
+				outline: 0;
+				
+				width: 160px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Zeon.js console</h1>
+		<p>Putting the semi colon back in js</p>
+
+<!--		<div style="position: relative;">
+			<pre id="cover" class="same"></pre>
+			<div id="caretLayer" class="same"><span id="caret"></span></div>
+			<textarea id="txta" class="same" wrap="off" spellcheck="false">'</textarea>
+		</div>
+-->
+		<textarea>
+// x should become string or number
+function num(){ return 5; }
+function strnum(){ return 'wtf' || num(); }
+function test(){ return strnum(); }
+function stuff(){ var x = test(); }
+
+// again, but now prototypal based :) and this.x gets null as well.
+Zeon.prototype = {
+	x: null,
+	num: function(){ return 5; },
+	strnum: function(){ return 'wtf' || this.num(); },
+	test: function(){ return this.strnum(); },
+	stuff: function(){ this.x = this.test(); }
+};
+</textarea><noscript>
+
+// complex call return type stuff...
+// x should become string or number
+function num(){ return 5; }
+function strnum(){ return 'wtf' || num(); }
+function test(){ return strnum(); }
+function stuff(){ var x = test(); }
+// again, but now prototypal based :) and this.x gets null as well.
+Zeon.prototype = {
+	x: null,
+	num: function(){ return 5; },
+	strnum: function(){ return 'wtf' || this.num(); },
+	test: function(){ return this.strnum(); },
+	stuff: function(){ this.x = this.test(); }
+};
+
+
+// extra typing
+function f(){ return 5; };
+function g(){ return "foo"; };
+function h(){ if (x) return true; return 15; }
+var x = f();
+x = f();
+var z = g() && h();
+y = g() && h();
+var a = x ? g() : h();
+aa = x ? g() : h();
+var b = undefined && (null, x ? g() : h());
+bb = undefined && (null, x ? g() : h());
+Foo.prototype.xxx = function(){
+	return "foo";
+};
+Foo.prototype.test = function(){
+	var x = this.xxx();
+};
+
+
+// useless parens
+var x = (f00);
+var x = (f00,bar);
+var x = ((f00,bar));
+var x = ((f00),bar);
+function foo(){}
+var x = ();
+
+
+// /** autocomplete on enter
+/**
+function f(){}
+/**
+var x = function(){};
+/**
+var x = 5;
+/**
+x = 7;
+/**
+var a,b=10,c="foo";
+/**
+var o = {
+	/**
+	foo: function(){},
+	/**
+	bar: 5
+};
+
+
+// primitive statement is dead code
+"meh";
+500;
+foo();
+"bar";
+also();
+/regex/es;
+
+
+// more undeclared prototype property tests. the last two should not show warnings for we cant determine their prototype
+x = {y:function f(){ alert(this.foo); }};
+x.y = function(){ alert(this.man); };
+z.prototype = { x: function(){ return this.blargh; }};
+x = function(){ alert(this.bah); };
+function R(){ alert(this.some); }
+call(function(){ return this.blaaat; });
+(function(){ return this.xxx; })();
+
+// copying this.xxx to prototype and warning for undeclared prototype props
+var Person = function(name){
+	this.name = name;
+};
+Person.prototype = {
+	say: function(){
+		alert(this.name);
+	},
+	speak: function(){
+		this.say();
+	},
+	secret: function(){
+		return this.secretHandshake;
+	}
+};
+Person.prototype.x = 5;
+Person.prototype.sayX = function(){ alert(this.x); this.y = 10; };
+Person.SubClass = function(type){
+	this.type = type;
+}
+
+
+
+// assigning types to trailing property names which have some dynamic stuff before them...
+// also sets between properties to object (kind of useless beyond that)
+foo.bar[x].what.baz = 5;
+foo.bar(x).what.baz = 5;
+
+// selecting jsdoc param should also highlight jsdoc line
+/**
+ @param {Foo} bar baz
+ */
+function f(bar){
+	bar = 5;
+}
+
+
+// uninitialized variable usages in loop
+var fool,key,value;
+function f(x) { // x should be "initialized" (unknown status)
+	while (fool) {
+		fool = bars; // globals are unknown so not marked either
+		x += "five";
+	}
+}
+for (key in value) { // key should not be marked since its set by the for-in
+	alert(key);
+}
+
+
+// should have an error (assignment can only happen in parens)
+for (var i=0 in x) {}
+
+// multi-line comment parsing tests
+var x = 'foo';
+function f(){}
+/** hello world */
+/* this * is / a test */
+/* a multi
+line test */
+/* incomplete
+and.moving.on
+
+
+// jsdoc in caret popup
+/**
+ * 
+ 	*   hello world
+	
+   *
+ * @name f
+ * @jspath /f
+ * @param {?} a hello world :)
+ * @returns {undefined}
+ */
+function sss(a){}
+/** foo */
+var bbbb = function(){};
+/** @var {Array} what the fucka */
+var cccc = foo;
+/**
+ *   hello world
+ */
+function f(a){}
+/** foo */
+var g = function(){};
+/** boo */
+var k = function l(){};
+/** @var {Array} v the fucka */
+var v = foo;
+var k = function rg(){};
+function sh(){}
+/**
+ *   hello worldddd
+ */
+x = function(){};
+
+// jsdoc param mis match
+/**
+ * 
+ * @name f
+ * @jspath /f
+ * @param {foo|bar} a
+ * @param {?} b
+ * @returns {undefined}
+ */
+function f(a,b){ a=5;}
+
+// regex test suite
+/foo/;
+/[fo]/;
+!/[no class;
+!/[no class/;
+!/[no class\];
+!/[no class\]/;
+!/[no class\]];
+/[no class\]]/;
+/]/;
+/()/;
+/(foo)/;
+/(f(oo))/;
+/(f)o(o)/;
+!/(foo/;
+!/(foo;
+!/foo)/;
+!/foo);
+/f?/;
+/f+/;
+/f*/;
+/f+?/;
+/f*?/;
+!/f+*/;
+!/f?*/;
+!/f?+/;
+!/f*+/;
+/(?:foo)/;
+/(?!foo)/;
+/(?=foo)/;
+!/(?foo)/;
+/^foo/;
+/^foo$/;
+/foo$/;
+/^foo|^bar/;
+/foo|^bar/;
+/foo$|bar$/;
+/foo$|bar/;
+/foo|bar$/;
+!/$foo^/;
+!/^?/;
+!/$?/;
+/f{1}/;
+/f{11}/;
+/f{1,}/;
+/f{1,2}/;
+/f{1,22}/;
+!/f{}/;
+!/f{,}/;
+!/f{,2}/;
+!/f{;
+!/f{/;
+!/f};
+!/f}/;
+/a|ab/;
+/((a)|(ab))((c)|(bc))/;
+/a[a-z]{2,4}/;
+/a[a-z]{2,4}?/;
+/^(a+)\1*,\1+$/;
+/(z)((a+)?(b+)?(c))*/;
+/((b+)?)/;
+/(a*)*/;
+/(a*)b\1+/;
+/(?=(a+))/;
+/(?=(a+))a*b\1/;
+/(.*?)a(?!(a+)b\2c)\2(.*)/;
+/((b*)?)/;
+// http://mathiasbynens.be/demo/url-regex
+/(((http|ftp|https):\/{2})+(([0-9a-z_-]+\.)+(aero|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cu|cv|cx|cy|cz|cz|de|dj|dk|dm|do|dz|ec|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mn|mn|mo|mp|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|nom|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ra|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw|arpa)(:[0-9]+)?((\/([~0-9a-zA-Z\#\+\%@\.\/_-]+))?(\?[0-9a-zA-Z\+\%@\/&\[\];=_-]+)?)?))\b/imuS;
+/(^|[\s.:;?\-\]<\(])(https?:\/\/[-\w;/?:@&=+$\|\_.!~*\|'()\[\]%#,â˜º]+[\w/#](\(\))?)(?=$|[\s',\|\(\).:;?\-\[\]>\)])/;
+/\b(([\w-]+:\/\/?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/)))/iS;
+/(i)\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?Â«Â»â€œâ€â€˜â€™]))/iS;
+/(?:\b[a-z\d.-]+:\/\/[^<>\s]+|\b(?:(?:(?:[^\s!@#$%^&*()_=+[\]{}\|;:'",.<>/?]+)\.)+(?:ac|ad|aero|ae|af|ag|ai|al|am|an|ao|aq|arpa|ar|asia|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|biz|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|cat|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|coop|com|co|cr|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|edu|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gov|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|info|int|in|io|iq|ir|is|it|je|jm|jobs|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mil|mk|ml|mm|mn|mobi|mo|mp|mq|mr|ms|mt|museum|mu|mv|mw|mx|my|mz|name|na|nc|net|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|org|pa|pe|pf|pg|ph|pk|pl|pm|pn|pro|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tel|tf|tg|th|tj|tk|tl|tm|tn|to|tp|travel|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|xn--0zwm56d|xn--11b5bs3a9aj6g|xn--80akhbyknj4f|xn--9t4b11yi5a|xn--deba0ad|xn--g6w251d|xn--hgbk6aj7f53bba|xn--hlcj6aya9esc7a|xn--jxalpdlp|xn--kgbechtv|xn--zckzah|ye|yt|yu|za|zm|zw)|(?:(?:[0-9]|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:[0-9]|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]))(?:[;/][^#?<>\s]*)?(?:\?[^#<>\s]*)?(?:#[^<>\s]*)?(?!\w))/iS;
+/\b((ftp|https?):\/\/[-\w]+(\.\w[-\w]*)+|(?:[a-z0-9](?:[-a-z0-9]*[a-z0-9])?\.)+(?: com\b|edu\b|biz\b|gov\b|in(?:t|fo)\b|mil\b|net\b|org\b|[a-z][a-z]\b))(\:\d+)?(\/[^.!,?;"'<>()\[\]{}\s\x7F-\xFF]*(?:[.!,?]+[^.!,?;"'<>()\[\]{}\s\x7F-\xFF]+)*)?/iS;
+/^([a-z][a-z0-9\*\-\.]*):\/\/(?:(?:(?:[\w\.\-\+!$&'\(\)*\+,;=]|%[0-9a-f]{2})+:)*(?:[\w\.\-\+%!$&'\(\)*\+,;=]|%[0-9a-f]{2})+@)?(?:(?:[a-z0-9\-\.]|%[0-9a-f]{2})+|(?:\[(?:[0-9a-f]{0,4}:)*(?:[0-9a-f]{0,4})\]))(?::[0-9]+)?(?:[\/|\?](?:[\w#!:\.\?\+=&@!$'~*,;\/\(\)\[\]\-]|%[0-9a-f]{2})*)?$/xiS;
+/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/iS;
+/([a-z]([a-z]|\d|\+|-|\.)*):(\/\/(((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?((\[(|(v[\da-f]{1,}\.(([a-z]|\d|-|\.|_|~)|[!\$&'\(\)\*\+,;=]|:)+))\])|((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|(([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=])*)(:\d*)?)(\/(([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*|(\/((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)|((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)|((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)){0})(\?((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\xE000-\xF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\x00A0-\xD7FF\xF900-\xFDCF\xFDF0-\xFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?/iS;
+/((https?:\/\/|ftp:\/\/|www\.|[^\s:=]+@www\.).*?[a-z_\/0-9\-\#=&])(?=(\.|,|;|\?|\!)?("|'|Â«|Â»|\[|\s|\r|\n|$))/iS;
+/(https?|ftp):\/\/(-\.)?([^\s/?\.#-]+\.?)+(\/[^\s]*)?$/iS;
+/f[o]{1}o{1,}(bar){1,2}/;
+!/foo^bar/;
+/foo(?:^bar)/;
+/foo(?=^bar)/;
+/foo(?!^bar)/;
+/(?:^\s*\/\**\s*(.*))|(?:^\s*\**\s*(.*))/gm;
+
+// window.foo is global
+foo.bar;
+window.foo = 5;
+
+
+// jsdoc generation on enter and multi line token caret position
+/**
+function f(a,b){
+	"foo\
+		bar\
+		baz";
+}
+
+
+// hoisting fix with function declarations
+f();
+var ab;
+function f(){
+	foo(g);
+	var ab;
+	function g(){
+		z();
+		var z;
+	}
+}
+var x;
+function h() { var i; }
+		var x;
+		(function(){
+			var y = "yes";
+			alert;
+			function f(){}
+			function g(){}
+			function h(){}
+		})();
+		var z;
+		function g(){
+			alert;
+			function f1(){}
+			function f12(){}
+			function f13(){}
+		}
+		var xx = 10;
+		function a(){ var yy; alert(); var zz = 5; }
+		function b(){}
+		function c(){}
+		var boo;
+
+// extract method
+var x = 5;
+x = 6;
+var f = x;
+alert(f,x);
+
+// extract method:
+function branch(indent, state){
+	indent |= 0;
+
+	var s = '{\n';
+	++indent;
+	var broke = false;
+	s += arr.map(function(o){
+		if (broke) return '';
+		broke = o.isRETURN || o.isBREAK || o.isCONTINUE || o.isTHROW;
+		return indent.tabs()+o.branch(indent, state)+(o.isEXPRESSIONS?';':'')+'\n';
+	}).join('');
+	--indent;
+	s += indent.tabs()+'}';
+
+	return s;
+};
+becomes -->
+/**
+ * 
+function anon(arr, indent, state){
+	var s = '{\n';
+	++indent;
+	var broke = false;
+	s += arr.map(function(o){
+		if (broke) return '';
+		broke = o.isRETURN || o.isBREAK || o.isCONTINUE || o.isTHROW;
+		return indent.tabs()+o.branch(indent, state)+(o.isEXPRESSIONS?';':'')+'\n';
+	}).join('');
+	
+	return [s,broke];
+}
+function branch(indent, state){
+	indent |= 0;
+	var r = anon(arr, indent, state);
+	var s = r[0];
+	var broke = r[1];
+	--indent;
+	s += indent.tabs()+'}';
+
+	return s;
+};
+
+
+
+// try-catch-finally and deadcode
+function f(){
+	try {
+		
+	} catch (e) {
+		return
+	}
+	abc;
+}
+function g(){
+	try {
+		return
+	} finally {
+		
+	}
+	abc;
+}
+function h(){
+	try {
+		
+	} catch (e) {
+		return
+	} finally {
+		
+	}
+	abc;
+}
+
+
+
+
+// var statement rewriting
+var x = 5;
+var x = 6;
+var y = "foo";
+var d = hello;
+var z;
+var y,z;
+var a, b=3,c,d=7,e;
+function f(){
+	foo = "meh";
+	var foo;
+			function goo (){ var barz = hello; }
+	function g(){
+		var foo;
+		var owoo;
+	}
+	var x = function(){
+		var gee;
+		var fdsfds
+	};
+}
+
+
+
+
+// dead statements and try-catch-finally
+function tryIt(f) {
+	try {
+		//return f();
+	} catch(e) {
+		return foo;
+	}
+	return null;
+}
+function tryIt(f) {
+	try {
+		//return f();
+	} finally {
+		return
+	}
+	return null;
+}
+function tryIt(f) {
+	try {
+		//return f();
+	} catch(e) {
+		//return bar;
+	} finally {
+		return bar;
+	}
+	return null;
+}
+
+
+
+// ternary static expression
+5 && ( "foo" ? "meh" : "hai" );
+5 && ( x ? "meh" : "hai" );
+5 && ( "foo" ? x : "hai" );
+5 && ( "foo" ? "meh" : x );
+5 && ( "foo" ? x : x );
+
+
+
+//#define foo
+//#ifdef foo
+bar
+//#elsedef
+boo
+//#endif
+
+
+
+
+// nested ifdef
+a;
+//#ifdef foo
+b;
+//#ifdef bar
+c;
+//#endif
+d;
+//#endif
+e;
+
+
+
+
+// jspath
+try {
+	var e = 5;
+} catch (e) {
+	e.foo;
+	var b = 10;
+	try {
+		var f = 5;
+	} catch (g) {
+		g.foo;
+		var c = 20;
+	}
+}
+var obj = {x:y};
+(function(){});
+function f(){
+	var Stuff = function(){};
+	Stuff.prototype = {
+		bar: function(e){
+			var f = 6;
+		},
+		foo: 6
+	};
+	Stuff.prototype.foo = 5;
+}
+y = {
+	getPosition: function(){
+		return {x:x};
+	}
+};
+
+
+
+// jsdoc rewriting example
+	/**   
+
+	fiii
+	 * man what the fuck does this do?
+	 f fds
+	 zf szfd z
+	 
+	  fdsf 
+	  * fd zfdzs 
+	  
+	 fdszfdsz
+	 
+	 
+	 * @param {Array} a foo baar bz
+	 * @param {string|boolean} b dfdasfdsf dsa fda fdsa
+	 * @return {RegExp}
+	 */
+
+	function bar(a,b){ a=5; b="foo"; return 5; }
+
+
+
+	// jsdoc example
+	function bar(a,b){ a=5; b="foo"; return 5; }
+
+	var boo = function(a,b){a=5; a="foo"; if (true) return 5; else return "six";};
+
+	var baz = function woo(a,b,c){ throw "foo"; };
+
+	var obj = {};
+
+	obj.nop = function(a,b,c){a=/foo/; b=a; };
+	
+	obj.zoo = function zon(){ if (true) throw "foo"; else throw 5; };
+
+	var nobj = {x: function(){}, y: function baa(){} };
+
+
+
+// inline pragma example
+function foo(){//#inline foo
+	debug("foo");
+	log(bar);
+}//#endline
+
+function bar(){
+	foo();
+}
+
+
+// macro pragma example
+var constants = {
+	FOO: 1, //#macro constants.FOO 1
+	BAR: 2, //#macro constants.BAR 2
+	BAZ: 3, //#macro constants.BAZ 3
+	BOO: 4  //#macro constants.BOO 4
+};
+alert(constants.FOO, constants.BAR, constants.BAZ, constants.BOO);
+
+
+// simple profiler example
+function f(){
+	for (var i=0; i<2000; ++i) {
+		if (!(i % 2)) nop();
+		if (!(i % 3)) nop();
+		if (!(i % 4)) nop();
+		if (!(i % 5)) nop();
+		if (!(i % 6)) nop();
+	}
+}
+function nop(){}
+f();
+
+
+// define pragma without initializer
+abc
+//#define noo
+more_code
+//#ifdef doo
+def
+//#elseifdef moo
+dafdsads
+//#elseifdef boo
+fooooo
+//#elseifdef goo
+fooooo
+//#elsedef
+grrr
+//#endif
+bar
+
+// define pragma with initalizer
+abc
+var boo = false; //#define boo
+more_code
+if (false) { //#ifdef doo
+def
+} else if (false) { //#elseifdef moo
+dafdsads
+} else if (boo) { //#elseifdef boo
+fooooo
+} else if (false) { //#elseifdef goo
+fooooo
+} else { //#elsedef
+grrr
+}//#endif
+bar
+
+
+
+// js1k profiler demo
+m = Math;
+k = document.createElement('canvas');
+k.style.position = 'absolute';
+//document.body.insertBefore(k, document.body.firstChild);
+document.body.appendChild(k);
+k.height = 300;
+k.width = 500;
+c = k.getContext('2d');
+ep = {
+    x: 250,
+    y: 150
+};
+mp = ep;
+k.onmousemove = q;
+k.onclick = z;
+p = [];
+g = {
+    x: 0,
+    y: .1
+};
+for (i = 0; i < 20; i++) {
+    b()
+}
+
+function b() {
+    p.push({
+        x: ep.x,
+        y: ep.y,
+        c: e(),
+        a: d(),
+        b: d(),
+        s: r() * 4 + 1
+    })
+}
+setInterval(a, 30);
+
+function e() {
+    return [f(), f(), f()]
+}
+
+function f() {
+    return m.round(r() * 255)
+}
+
+function d() {
+    return r() * 3 * 2 - 3
+}
+
+function r() {
+    return m.random()
+}
+
+function z() {
+    g = {
+        x: r() / 3 - 1 / 6,
+        y: r() / 3 - 1 / 6
+    }
+}
+
+function a() {
+    c.fillStyle = "rgba(0,0,0,.1)";
+    c.fillRect(0, 0, 500, 300);
+    for (i = p.length - 1; i >= 0; i--) {
+        c.fillStyle = "rgb(" + p[i].c[0] + "," + p[i].c[1] + "," + p[i].c[2] + ")";
+        c.beginPath();
+        c.arc(p[i].x, p[i].y, p[i].s, 0, m.PI * 2, true);
+        c.fill();
+        p[i].x += p[i].a;
+        p[i].y += p[i].b;
+        p[i].a += g.x;
+        p[i].b += g.y;
+        if (p[i].x > 500 || p[i].x < 0 || p[i].y > 300 || p[i].y < 0) {
+            p.splice(i, 1)
+        }
+    }
+    for (i = 0; i < 8; i++) {
+        b();
+    }
+    ep.x += (mp.x - ep.x) / 20;
+    ep.y += (mp.y - ep.y) / 20;
+}
+function q(e) {
+    var x, y;
+    if (e.offsetX) {
+        x = e.offsetX;
+        y = e.offsetY;
+    } else if (e.layerX) {
+        x = e.layerX;
+        y = e.layerY;
+    }
+    mp = {
+        x: x,
+        y: y
+    };
+}
+// end of js1k demo
+
+
+
+
+var x = 5;
+for (var i=0; i<10; ++i) {
+	x += i;
+	if (x > 10) x /= 2;
+}
+console.log("result = x");			
+
+
+
+
+	var F = function(){};
+	F.prototype = {
+		x:5,
+		y:function(){}
+	};
+
+
+
+
+	function f(stack){
+		if (stack.desc == 'grouped') {
+			var exp = this.getExpressionsFromGroup(stack);
+			if (!exp) return false;
+			return this.getValidAssigneeLead(exp);
+		}
+
+		if (stack.desc == 'expressions') return this.isValidAssigneeExpressions(stack);
+		
+		if (stack.leadValue) return stack;
+		
+		return false;
+	}
+
+
+	for (key in val) {
+		if (val.hasOwnProperty(key));
+	}
+
+
+
+	try {
+		var x = function f(){
+			for (key in obj) throw x;
+			stuff;
+		};
+		yyyyy;
+	} catch(e){
+		zzzz;
+	}
+	aaa;
+	
+	
+	
+	
+	function f(){
+		if (true) {
+			x:	switch (x) { 
+				case x :  
+					a ; 
+					break;
+					b ; 
+				case n:  
+					c; 
+					return;
+					d;  
+				default: 
+					return;
+					r;
+					s;
+			}
+			xxxxxxxx
+		}
+		yyyyyyyyyyy
+	}
+	zzzzzz
+
+
+
+function f(){
+	if (2) {
+		return;
+	} else if (3) {
+		return
+		14;
+	} else {
+		15;
+	}
+	yyyyyyy;
+	throw foo;
+	faaaaal;
+}
+bar;
+
+
+
+
+switch (x) { case x : a ; break; b ; case n: c; d; default: r; s; }
+switch (x) { 
+	case x :  
+		a ; 
+		break;  
+		b ; 
+	case n:  
+		c; 
+		d;  
+	default: 
+		r;
+		s;
+}
+
+
+    a   &    b  && f  ,   fddsa *   ( dskd   =   drr99  ),    c    *    d   +    e   
+
+	a.g = 5;
+	b = true;
+	(c.h) = [5];
+	++d;
+	++(e);
+	++(f.i);
+	
+	++ [];
+	++ {};
+	+{} ++;
+	[] ++;
+
+
+
+
+aaaa = 5;
+(bbbb) = 5;
+((cccc)) = 5;
+dddd[1] = 5;
+(eeee[1]) = 5;
+ffff.gggg().jjjj = 5;	
+(hhhh.iiii().kkkk) = 5;
+
+
+
+switch (x) { case x : a ; b ; case n: c; d; default: r; s; }
+
+
+	/**
+	 * Post parser processing. First phase. Takes care of anything that
+	 * - check identifiers for being known (ecma, browser, dev, etc)
+	 * - do line administration
+	 * 
+	 * @param {Object[]} stack Branch of the parse tree
+	 * @param {Object[]} [_scope] Contains all variables and outer scopes reachable from current code (inc. this and if applicable also arguments)
+	 * @param {String[]} [_labels] Contains all valid labels from the current code (break, continue)
+	 * @param {boolean} [_insideConditional] Are we currently inside  condition? like the if or while statement header... warning stuff for =
+	 * @param {boolean} [_insideFunction] Are we currently inside any function? Check for return keyword
+	 * @param {boolean} [_insideSwitch] Are we currently inside a switch? Allows anonymous break
+	 * @param {boolean} [_insideIteration] Are we currently inside an iteration? Allows anonymous break and continue and warns for functions
+	 */
+	var phase1 = function(stack, _scope, _labels, _insideConditional, _insideFunction, _insideSwitch, _insideIteration){
+
+	}
+
+
+
+
+
+var a = true;
+wind: switch (5+1+document){
+	case 5:
+		break;
+	case 6:
+		if (a) { 
+			if (a) { break wind; }
+			else { 
+				if (a) { break; }
+				else { break; }
+			}
+		}
+		else { 
+			if (a) { break; }
+			else { break; }
+		}
+}
+
+			xxxxxxxx = {pppppppppp:5555555555};
+			var x = 5 + 5; y = 5 + 5;
+			var x = "a" + 5; y = 'b' + 5;
+			var x = /a/b + 5; y = /b/ + 5;
+			var x = [a] + 5; y = [b] + 5;
+			var x = {a:1} + 5; y = {b:"y"} + 5;
+			var x = function(){} + 5; y = function t(){} + 5;
+			var x = null + 5; y = null + 5;
+			var x = true + 5; y = false + 5;
+			var x = undefined + 5; y = undefined + 5;
+
+			var x = 5; y = 5;
+			var x = "a"; y = 'b';
+			var x = /a/b; y = /b/;
+			var x = [a]; y = [b];
+			var x = {a:1}; y = {b:"y"};
+			var x = function(){}; y = function t(){};
+			var x = null; y = null;
+			var x = true; y = false;
+			var x = undefined; y = undefined;
+
+
+
+
+	var definedButUnused;
+
+	var definedTwice;
+	var definedTwice;
+	definedTwice;
+
+	priorUsage;
+	var priorUsage;
+
+	var shadow;
+	function(){
+		var shadow;
+	}
+
+	var lookupDepth;
+	function foo() {
+		lookupDepth;
+		function foo() {
+			lookupDepth;
+			function foo() {
+				lookupDepth;
+				function foo() {
+					lookupDepth;
+					function foo() {
+						lookupDepth;
+					}
+				}
+			}
+		}
+	}
+
+	var trackingObject;
+	trackingObject;
+	function f(){ trackingObject; }
+
+	var xxxx = 5;              yyyy = 5;
+	var xxxx = "a";            yyyy = 'b';
+	var xxxx = /a/b;           yyyy = /b/;
+	var xxxx = [a];            yyyy = [b];
+	var xxxx = {a:1};          yyyy = {b:"y"};
+	var xxxx = function(){};   yyyy = function t(){};
+	var xxxx = null;           yyyy = null;
+	var xxxx = true;           yyyy = false;
+	var xxxx = undefined;      yyyy = undefined;
+
+	var xxxx = 5 + 5;             yyyy = 5 + 5;
+	var xxxx = "a" + 5;           yyyy = 'b' + 5;
+	var xxxx = /a/b + 5;          yyyy = /b/ + 5;
+	var xxxx = [a] + 5;           yyyy = [b] + 5;
+	var xxxx = {a:1} + 5;         yyyy = {b:"y"} + 5;
+	var xxxx = function(){} + 5;  yyyy = function t(){} + 5;
+	var xxxx = null + 5;          yyyy = null + 5;
+	var xxxx = true + 5;          yyyy = false + 5;
+	var xxxx = undefined + 5;     yyyy = undefined + 5;
+
+	property.means.object
+	var confusingArray = [];
+	confusingArray.length;
+
+	new X;
+
+	function A(){}
+	new A;
+
+	function B(){}
+	B.prototype;
+
+
+	var deadCode;
+	wind: switch (something){
+		case "15":
+			break;
+			deadCode;
+		case 6:
+			if (a) { 
+				if (a) { 
+					break wind; 
+				} else { 
+					if (a) { break; }
+					else { break; }
+					deadCode
+				}
+			}
+			else { 
+				if (a) { break; }
+				else { 
+				
+				}
+				liveCode;
+			}
+	}
+
+
+
+
+	a == b
+	a != b
+
+	if (x) y;
+
+	if (x)
+	y;
+
+	if (x = y) ;
+
+	if ( _x || x_ ) ;
+
+	/abc.def/;
+	/ef[^g]/;
+
+	++x; x--;
+
+	a|b;
+
+	abc["def"];
+
+	5;
+	05;
+	5.;
+	.5;
+
+	a /= 10;
+
+	a() = 10;
+	this = 10;
+
+	"a\b";
+	/a\b/;
+
+	0xFF;
+
+	/x/();
+
+	x +++ y;
+
+	!!x;
+
+	"x	y";
+
+	try {
+		var e;
+	} catch(e) {
+		e = 10;
+	}
+
+	new Math;
+
+
+
+
+</noscript>
+		<pre id="dbg"></pre>
+		<div id="out"></div>
+
+		<script>
+			new function(){
+				// fix size of textarea before zeonifing it
+				var e = document.getElementsByTagName('textarea')[0];
+				e.style.width = window.innerWidth - 50 + 'px';
+				e.style.height = window.innerHeight - 150 + 'px';
+			};
+		</script>
+		<script src="zeparser/unicodecategories.js"></script>
+		<script src="zeparser/Tokenizer.js"></script>
+		<script src="zeparser/ZeParser.js"></script>
+		<script src="Ast.js"></script>
+		<script src="Gui.js"></script>
+		<script src="Gui.Config.js"></script>
+		<script src="Gui.Nav.js"></script>
+		<script src="Gui.Filter.js"></script>
+		<script src="Gui.Warning.js"></script>
+		<script src="Gui.Search.js"></script>
+		
+		<script src="fuzzing/fuzzRuderManOriginal.js"></script>
+		<script src="fuzzing/fuzzRuderManEdited.js"></script>
+		<script src="fuzzing/fuzzZee.js"></script>
+
+		<script src="Zeon.js"></script>
+		<script>
+			var gui = Gui.start(true);
+			gui.enableDnD();
+			gui.setPaddingTop(4);
+			window.onresize = function(e){
+				gui.resize((window.innerWidth - 40), (window.innerHeight - 150));
+			}.bind(this);
+		</script>
+	</body>
+</html>
