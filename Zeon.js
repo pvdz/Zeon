@@ -15,8 +15,7 @@
 // tofix: flow stuff for break with label...
 // tofix: nested comments all over?
 // tofix: clause should break: function a(){switch(x){case y:if(data)return; else break;case y:oops;case z:nope;}}
-// tofix: why is third x just a string? 	var x = 5;	process(x);	x += y;
-// tofix: trimming whitespace at the end of the file doesnt do anything
+// tofix: properly handle +=, rather than chicken out
 
 
 // H certain operators are static too (void, typeof on primitives), take into account with static expressions
@@ -2563,10 +2562,11 @@ Zeon.prototype = {
 
 		var type = false;
 		if (lhs.trackingObject) lhs.hadAssignment = true; // mark variable as being initialized (one way or the other...)
-		if (op.value != '+=') {
+//		if (op.value != '+=') {
+			
 			type = this.getBinaryOperatorType(op.value);
 			if (type) return this.setTypeToRef(lhs, type);
-		}
+//		}
 		var rhs = stack[2];
 		return this.assignRightToLeft(lhs, op, rhs);
 	},
