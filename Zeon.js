@@ -17,7 +17,17 @@
 // tofix: clause should break: function a(){switch(x){case y:if(data)return; else break;case y:oops;case z:nope;}}
 // tofix: why is third x just a string? 	var x = 5;	process(x);	x += y;
 // tofix: trimming whitespace at the end of the file doesnt do anything
+/*Uncaught wtf no tracking object? 1896 zeon.js
 
+ * function f(){
+	try {
+		
+	} catch(e){
+		function g*(P{;
+	}
+
+}
+ */
 
 // H certain operators are static too (void, typeof on primitives), take into account with static expressions
 // M if some token is an array and .push or .unshift is called on on it, maybe add the type to the array types too...
@@ -1893,7 +1903,10 @@ Zeon.prototype = {
 			else this.processLeadValue(token, _scope);
 
 			// at this point, there ought to be a tracking object on the variable...
-			if (!token.trackingObject) throw "wtf no tracking object?";
+			if (!token.trackingObject) {
+				if (this.hasError) token.trackingObject = {}; // happens for: `function f(){ try { } catch(e){ function g`
+				else throw "wtf no tracking object?";
+			}
 			// code below depends on isEcma and isBrowser
 			if (!token.trackingObject.checkedKeywords) this.checkKnownKeywords(token);
 
