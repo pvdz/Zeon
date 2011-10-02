@@ -697,9 +697,15 @@ new function(){ testgroup = 'Warnings';
 		}
 	);
 	test('clause should break',
-		'switch(x){ case foo: alert(); case bar: fail; } switch(y){ default: foo; case: bar; } switch(n){ case: x; default: y; }',
+		'switch(x){ case foo: alert(); case bar: fail; } switch(y){ default: foo; case x: bar; } switch(n){ case x: x; default: y; }',
 		function(zeon){
 			hasWarning(zeon, ['default','case'], 'clause should break');
+		}
+	);
+	test('clause should break (2)',
+		'function a() {\n\tswitch (x) {\n\t\tcase y:\n\t\t\tif (data) return;\n\t\t\telse break;\n\t\tcase y:\n\t\t\toops;\n\t\tcase z:\n\t\t\tnope;\n\n\t}\n}\n',
+		function(zeon){
+			noWarning(zeon, ['case'], 'clause should break', 1);
 		}
 	);
 	test('switch is an if',
@@ -1262,3 +1268,4 @@ new function(){ testgroup = 'General systems';
 		function(zeon){ throw 'fixme'; }
 	)
 };
+

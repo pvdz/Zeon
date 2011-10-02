@@ -14,7 +14,6 @@
 // tofix: switch (x){ dsasadsadsadsadsa }
 // tofix: flow stuff for break with label...
 // tofix: nested comments all over?
-// tofix: clause should break: function a(){switch(x){case y:if(data)return; else break;case y:oops;case z:nope;}}
 // tofix: properly handle +=, rather than chicken out
 
 
@@ -1735,7 +1734,9 @@ Zeon.prototype = {
 		if (lastClause) {
 			lastClause.stops = 0;
 			parent.maxStops = 0; // weakest link
+			lastClause.shouldBreak = true; // see phase 2
 		}
+
 		// move to next clause
 		lastClause = stack;
 		lastClause.hasStatements = 0;
@@ -1869,7 +1870,7 @@ Zeon.prototype = {
 		if (lastClause) {
 			lastClause.stops = 0;
 			stack.maxStops = 0; // weakest link
-			stack.shouldBreak = true; // see phase 2
+			lastClause.shouldBreak = true; // see phase 2
 		}
 		// if maxStops is not null, at least one clause was found (very likely ;), set stops to the weakest flow-stop of all clauses
 		if (stack.sub == 'switch') {
