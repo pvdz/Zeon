@@ -714,8 +714,26 @@ new function(){ testgroup = 'Warnings';
 			hasWarning(zeon, 'switch', 'switch is an if');
 		}
 	);
-	test('unwrapped for-in',
-		'for (key in obj) alert(f); for (x in y) { more; } for (a in b) if (b.hasOwnProperty(a)) { stuff; } for (c in d) { if (b.hasOwnProperty(a)) stuff; fail; }',
+	test('unwrapped for-in (1)',
+		'for (key in obj) alert(f);',
+		function(zeon){
+			hasWarning(zeon, 'for', 'unwrapped for-in');
+		}
+	);
+	test('unwrapped for-in (2)',
+		'for (x in y) { more; }',
+		function(zeon){
+			hasWarning(zeon, 'for', 'unwrapped for-in');
+		}
+	);
+	test('unwrapped for-in (3)',
+		'for (a in b) if (b.hasOwnProperty(a)) { stuff; }',
+		function(zeon){
+			hasWarning(zeon, 'for', 'unwrapped for-in');
+		}
+	);
+	test('unwrapped for-in (4)',
+		'for (c in d) { if (b.hasOwnProperty(a)) stuff; fail; }',
 		function(zeon){
 			hasWarning(zeon, 'for', 'unwrapped for-in');
 		}

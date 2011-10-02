@@ -11,7 +11,6 @@
 //operators though, specifically the + and +=. not sure but i'll have to somehow resolve that later.
 
 // tofix: legacy typing may be thrown out...
-// tofix: switch (x){ dsasadsadsadsadsa }
 // tofix: flow stuff for break with label...
 // tofix: properly handle +=, rather than chicken out
 
@@ -2909,8 +2908,9 @@ Zeon.prototype = {
 		}
 
 	},
-	checkForInWrap: function(token, stack){
-		if (token.desc == 'statement-parent') {
+	checkForInWrap: function(stack, parent){
+//		console.log(["foo", stack, parent])
+		if (parent.desc == 'statement') {
 			// this is the single body for a for-in loop
 			// check if it's wrapped to check for own property
 
@@ -2919,12 +2919,12 @@ Zeon.prototype = {
 			// so we need to somehow grab the key and obj names too, in some weird future :) TOFIX
 
 			// normalize the statement to an if in case of a block
-			if (token.sub == 'block' && token.statements == 1) {
+			if (stack.sub == 'block' && stack.statements == 1) {
 				var blockpos = -1;
-				while (token[++blockpos].desc != 'statement-parent');
-				var ifStatementToken = token[blockpos];
+				while (stack[++blockpos].desc != 'statement-parent');
+				var ifStatementToken = stack[blockpos];
 			} else {
-				var ifStatementToken = token;
+				var ifStatementToken = stack;
 			}
 
 			// process the statement and match the desired pattern
@@ -2943,7 +2943,7 @@ Zeon.prototype = {
 				tree[++pos].value == ')'
 			)) {
 				// for is not wrapped
-				this.addWarning(stack[0], 'unwrapped for-in');
+				this.addWarning(parent[0], 'unwrapped for-in');
 			}
 		}
 	},
