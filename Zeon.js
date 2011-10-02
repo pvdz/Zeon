@@ -2909,7 +2909,6 @@ Zeon.prototype = {
 
 	},
 	checkForInWrap: function(stack, parent){
-//		console.log(["foo", stack, parent])
 		if (parent.desc == 'statement') {
 			// this is the single body for a for-in loop
 			// check if it's wrapped to check for own property
@@ -2918,33 +2917,34 @@ Zeon.prototype = {
 			// the if should start with exactly: if (obj.hasOwnProperty(key))
 			// so we need to somehow grab the key and obj names too, in some weird future :) TOFIX
 
-			// normalize the statement to an if in case of a block
-			if (stack.sub == 'block' && stack.statements == 1) {
-				var blockpos = -1;
-				while (stack[++blockpos].desc != 'statement-parent');
-				var ifStatementToken = stack[blockpos];
-			} else {
-				var ifStatementToken = stack;
+			// if block, make sure it contains only a single statement
+			if (stack.sub == 'block' && stack.statements != 1) {
+				this.addWarning(this.btree[stack.nextBlack], 'unwrapped for-in');
+				return;
 			}
 
-			// process the statement and match the desired pattern
-			var tree = this.btree;
-			var pos = ifStatementToken.nextBlack;
-
-			if (!(tree[pos+8] &&
-				tree[pos].value == 'if' &&
-				tree[++pos].value == '(' &&
-				tree[++pos].name == 2/*identifier*/ &&
-				tree[++pos].value == '.' &&
-				tree[++pos].value == 'hasOwnProperty' &&
-				tree[++pos].value == '(' &&
-				tree[++pos].name == 2/*identifier*/ &&
-				tree[++pos].value == ')' &&
-				tree[++pos].value == ')'
-			)) {
-				// for is not wrapped
-				this.addWarning(parent[0], 'unwrapped for-in');
-			}
+			parent.some(function(t){
+				if (t.desc == 'statement-parent') {
+					// process the statement and match the desired pattern
+					var tree = this.btree;
+					var pos = t.nextBlack;
+					if (tree[pos].value == '{') ++pos; // skip block start (if block, we already "validated" it before
+					if (!(
+						tree[pos].value == 'if' &&
+						tree[++pos].value == '(' &&
+						tree[++pos].name == 2/*identifier*/ &&
+						tree[++pos].value == '.' &&
+						tree[++pos].value == 'hasOwnProperty' &&
+						tree[++pos].value == '(' &&
+						tree[++pos].name == 2/*identifier*/ &&
+						tree[++pos].value == ')'
+					)) {
+						// for is not wrapped
+						this.addWarning(parent[0], 'unwrapped for-in');
+					}
+					return true; // only one
+				}
+			},this);			
 		}
 	},
 	checkForInVar: function(stack){

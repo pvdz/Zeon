@@ -729,13 +729,13 @@ new function(){ testgroup = 'Warnings';
 	test('unwrapped for-in (3)',
 		'for (a in b) if (b.hasOwnProperty(a)) { stuff; }',
 		function(zeon){
-			hasWarning(zeon, 'for', 'unwrapped for-in');
+			noWarning(zeon, 'for', 'unwrapped for-in');
 		}
 	);
 	test('unwrapped for-in (4)',
 		'for (c in d) { if (b.hasOwnProperty(a)) stuff; fail; }',
 		function(zeon){
-			hasWarning(zeon, 'for', 'unwrapped for-in');
+			noWarning(zeon, 'for', 'unwrapped for-in');
 		}
 	);
 	test('in out of for',
