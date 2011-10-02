@@ -1269,3 +1269,14 @@ new function(){ testgroup = 'General systems';
 	)
 };
 
+new function(){ testgroup = 'Error cases';
+	// in general, these tests should make sure that regardless of parse errors, the handling and output should still be proper and consistent
+	
+	test('bogus switch body',
+		'switch (x){ dsasadsadsadsadsa }', // used to hide the body identifier in an error, and it shouldnt.
+		function(zeon){
+			reject('tofix', true);
+		}
+	
+	);
+};

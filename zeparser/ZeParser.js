@@ -1432,6 +1432,7 @@ ZeParser.prototype = {
 		} //#endif
 		match = this.tokenizer.storeCurrentAndFetchNextToken(false, match, stack);
 		if (match.value != '{') match = this.failsafe('SwitchBodyStartsWithCurly', match);
+
 		if (this.ast) { //#ifdef FULL_AST
 			var lhc = match;
 		} //#endif
@@ -1447,13 +1448,16 @@ ZeParser.prototype = {
 		}
 
 		// if you didnt parse anything but not encountering a closing curly now, you might be thinking that switches may start with silly stuff
-		if (!parsedAnything && match.value != '}') match = this.failsafe('SwitchBodyMustStartWithClause', match);
+		if (!parsedAnything && match.value != '}') {
+			match = this.failsafe('SwitchBodyMustStartWithClause', match);
+		}
 
 		if (stack.parsedSwitchDefault && match.value == 'default') {
 			this.failignore('SwitchCannotHaveDoubleDefault', match, stack);
 		}
 
-		if (match.value != '}') match = this.failsafe('SwitchBodyEndsWithCurly', match);
+		if (match.value != '}' && match.name != 14/*error*/) match = this.failsafe('SwitchBodyEndsWithCurly', match);
+
 		if (this.ast) { //#ifdef FULL_AST
 			match.twin = lhc;
 			lhc.twin = match;

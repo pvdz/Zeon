@@ -13,9 +13,7 @@
 // tofix: legacy typing may be thrown out...
 // tofix: switch (x){ dsasadsadsadsadsa }
 // tofix: flow stuff for break with label...
-// tofix: nested comments all over?
 // tofix: properly handle +=, rather than chicken out
-// tofix: constant warning for embedded comments
 
 // H certain operators are static too (void, typeof on primitives), take into account with static expressions
 // M if some token is an array and .push or .unshift is called on on it, maybe add the type to the array types too...
