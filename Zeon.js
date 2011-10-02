@@ -15,7 +15,7 @@
 // tofix: flow stuff for break with label...
 // tofix: nested comments all over?
 // tofix: properly handle +=, rather than chicken out
-
+// tofix: constant warning for embedded comments
 
 // H certain operators are static too (void, typeof on primitives), take into account with static expressions
 // M if some token is an array and .push or .unshift is called on on it, maybe add the type to the array types too...
@@ -3776,7 +3776,7 @@ Zeon.prototype = {
 			if (this.regexInvalidHexEscape.test(token.value)) this.addWarning(token, 'invalid hex escape in string');
 		} else if (token.isComment) {
 			// probably only bad for multi-line comment. but warn regardless.
-			if (token.value.indexOf('/*',1) > 0 || token.value.indexOf('*/',1)) this.addWarning(token, 'nested comment');
+			if (token.value.indexOf('/*',1) > 0 || token.value.indexOf('*/',1) > 0) this.addWarning(token, 'nested comment');
 		}
 
 		// ### end warning stuff
