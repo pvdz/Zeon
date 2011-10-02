@@ -794,7 +794,7 @@ setTimeout(function(){
 			// stack tree
 			var tree = this.gui.zeon.tree;
 			// find all operators marked isAmbiguous. wrap their operands in parens.
-			this.disambiguate(tree);
+			this.gui.zeon.disambiguate();
 			// update output
 			this.gui.setValue(this.gui.zeon.wtree.map(function(o){ return o.value; }).join(''));
 		}.bind(this);
@@ -1154,26 +1154,6 @@ setTimeout(function(){
 		}
 //		console.log('ws',ws);
 		return ws;
-	},
-	disambiguate: function(stack){
-		var last = null;
-		stack.forEach(function(token){
-			if (token instanceof Array) {
-				var now = this.disambiguate(token);
-				if (!now.isWhite) last = now;
-			} else {
-				var now = token;
-				if (!now.isWhite) last = now;
-			}
-		},this);
-
-		if (stack.wasDisambiguated && stack.sub != ':') {
-			var first = this.gui.zeon.btree[stack.nextBlack];
-			first.value = '('+first.value;
-			last.value += ')';
-		}
-
-		return last;
 	},
 
 	stackToString: function(stack){

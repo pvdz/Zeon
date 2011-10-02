@@ -4572,6 +4572,34 @@ Zeon.prototype = {
 		}).join('|');
 	},
 
+	/**
+	 * Disambiguate the AST by adding parentheses around complex expressions with
+	 * more than one binary operator on the same (expression) level.
+	 * @param {Array} _stack=false Used by the function itself in recursion. It's a subtree.
+	 * @returns {Object} The last token of the current subtree
+	 */
+	disambiguate: function(_stack){
+		if (!_stack) _stack = this.tree; // init call
+		var last = null;
+		_stack.forEach(function(token){
+			if (token instanceof Array) {
+				var now = this.disambiguate(token);
+				if (!now.isWhite) last = now;
+			} else {
+				var now = token;
+				if (!now.isWhite) last = now;
+			}
+		},this);
+	
+		if (_stack.wasDisambiguated && _stack.sub != ':') {
+			var first = this.btree[_stack.nextBlack];
+			first.value = '('+first.value;
+			last.value += ')';
+		}
+	
+		return last;
+	},
+
 /* turns out to be _very_ slow... but would compute row/col for every token
 				// do row/col administration progressively now
 				match.col = this.col;
