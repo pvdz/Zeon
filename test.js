@@ -658,11 +658,15 @@ new function(){ testgroup = 'Warnings';
 		}
 	);
 	test('nested comment',
-		'/* /* */ // /*\n// */\n/* */// /* */',
+		'/* /* */\n// /*\n// */\n// /* */\n/* */',
 		function(zeon){
+			// we must do it the hard way because we need to target wtree, not btree
 			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
 			assert('has items', comments.length);
-			reject('has', comments.some(function(t){ return !t.warnings || t.warnings.indexOf('nested comment') < 0; }));
+			comments.some(function(t,i){ 
+				if (i < 4) return reject('has not '+i, !t.warnings || t.warnings.indexOf('nested comment') < 0);
+				return assert('has '+i, !t.warnings || t.warnings.indexOf('nested comment') < 0); 
+			});
 		}
 	);
 	test('new statement',
@@ -692,7 +696,6 @@ new function(){ testgroup = 'Warnings';
 	test('empty clause',
 		'switch(x){ case x: }',
 		function(zeon){
-			console.log(zeon.btree.filter(function(v){ return v.value == 'case'; }))
 			hasWarning(zeon, 'case', 'empty clause');
 		}
 	);
@@ -747,79 +750,85 @@ new function(){ testgroup = 'Warnings';
 	test('use {}',
 		'new Object();',
 		function(zeon){
-			hasWarning(zeon, 'new', 'use {}');
+			hasWarning(zeon, 'Object', 'use {}');
 		}
 	);
 	test('use []',
 		'new Array();',
 		function(zeon){
-			hasWarning(zeon, 'new', 'use []');
+			hasWarning(zeon, 'Array', 'use []');
 		}
 	);
 	test('double block',
 		'{{ i; think; }}',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, '{', 'double block', 1);
 		}
 	);
 	test('useless block',
-		'FIXME todo',
+		'function f(){{}} {}',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			noWarning(zeon, '{', 'useless block', 1);
 		}
 	);
 	test('use capital namespacing',
-		'new Foo; new bar;',
+		'new foo; new Bar;',
 		function(zeon){
-			hasWarning(zeon, ['Foo', 'bar'], 'typeof always string');
+			hasWarning(zeon, ['foo', 'Bar'], 'use capital namespacing', 1);
 		}
 	);
-	test('constructor called as a function',
-		'function F(){} F.prototype = 5; F(); function G(){}; new G; g();',
+	test('constructor called as a function (1)',
+		'function f(){} f.prototype = 5; f();',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			noWarning(zeon, 'f', 'constructor called as function', 2);
 		}
 	);
-	test('cannot incdec on call expression',
+	test('constructor called as a function (2)',
+		'function g(){}; new g;  g();',
+		function(zeon){
+			noWarning(zeon, 'g', 'constructor called as function', 2);
+		}
+	);
+	test('cannot inc/dec on call expression',
 		'++a(); --b(); c()++; d()--;',
 		function(zeon){
-			hasWarning(zeon, ['++','--'], 'cannot incdec on call expression');
+			hasWarning(zeon, ['++','--'], 'cannot inc/dec on call expression');
 		}
 	);
-	test('incdec only valid on vars',
+	test('inc/dec only valid on vars',
 		'++"foo"; --"foo"; "foo"++; "foo"--; ++5; --5; 5--; 5++; ++true; --true; true++; true--; ++false; --false; false++; false--; ++null; --null; null++; null--; ++/foo/; --/foo/; /foo/++; /foo/--;',
 		function(zeon){
-			hasWarning(zeon, ['++','--'], 'incdec only valid on vars');
+			hasWarning(zeon, ['++','--'], 'inc/dec only valid on vars');
 		}
 	);
-	test('bad asi patterns',
+	test('bad asi pattern',
 		'x\n/* foo */(function(){}); a\n(b);',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, function(t){ return t.isCallExpressionStart; }, 'bad asi pattern');
 		}
 	);
 	test('unlikely typeof result',
 		'typeof x == "crap"; typeof x == "string"',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, function(t){ return t.isString; }, 'unlikely typeof result', 1);
 		}
 	);
 	test('weird typeof op',
-		'FIXME todo',
+		'typeof x % "foo"; typeof x in y; typeof x == y;',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, ['%','in','=='], 'weird typeof op', 2);
 		}
 	);
 	test('typeof always string',
-		'FIXME todo',
+		'typeof x === "string"; typeof x !== "string"; typeof x == "string";',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, ['===','!==','=='], 'typeof always string', 2);
 		}
 	);
 	test('static expression',
-		'5+5; 5-"5"; "x"=="y"; t%/t/; / / / / /; x*(5&8);(2^1)-(3>>4);',
+		'5+5; 5-"5"; "x"=="y"; true%/t/; / / / / /; (2^1)-(3>>4);(5&8)*x;',
 		function(zeon){
-			hasWarning(zeon, ['+','-','==','%','/','*','&','^','>>'], 'static expression');
+			hasWarning(zeon, ['+','-','==','%','/','*','&','^','>>'], 'static expression', 9);
 		}
 	);
 	test('static condition',
@@ -829,51 +838,82 @@ new function(){ testgroup = 'Warnings';
 		}
 	);
 	test('pragma requires name parameter',
-		'//#define \n//#ifdef \n', // tofix: others
+		'//#define\n//#ifdef\n', // tofix: others
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length);
+			comments.some(function(t,i){
+				return assert('has '+i, t.warnings && t.warnings.indexOf('pragma requires name parameter') >= 0); 
+			});
 		}
 	);
 	test('pragma requires value parameter',
 		'//#macro foo ',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length);
+			comments.forEach(function(t,i){
+				assert('has '+i, t.warnings && t.warnings.indexOf('pragma requires value parameter') >= 0); 
+			});
 		}
 	);
 	test('missing ifdef',
 		'//#endif\n', // tofix: need to add way more
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length);
+			comments.forEach(function(t,i){
+				assert('has '+i, t.warnings && t.warnings.indexOf('missing ifdef') >= 0); 
+			});
 		}
 	);
 	test('missing inline',
 		'//#endline',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length);
+			comments.forEach(function(t,i){
+				assert('has '+i, t.warnings && t.warnings.indexOf('missing inline') >= 0); 
+			});
 		}
 	);
-	test('pragma missing end',
+	test('pragma start missing end',
 		'//#ifdef foo\n//#inline foo',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length == 2);
+			comments.forEach(function(t,i){
+				assert('has '+i, t.warnings && t.warnings.indexOf('pragma start missing end') >= 0);
+			});
 		}
 	);
 	test('macro name should be identifier',
 		'//#macro fail-ing 4\n//#macro ok 6\n//#macro also.ok 7',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			// we must do it the hard way because we need to target wtree, not btree
+			var comments = zeon.wtree.filter(function(t){ return t.isComment; });
+			assert('has items', comments.length);
+			comments.forEach(function(t,i){
+				if (i == 0) assert('has '+i, t.warnings && t.warnings.indexOf('macro name should be identifier') >= 0);
+				else reject('has not '+i, t.warnings && t.warnings.indexOf('macro name should be identifier') >= 0);
+			});
 		}
 	);
 	test('is dev relic',
 		'foo; bar; baz; tmp; log; console; test; alert; temp;',
 		function(zeon){
-			hasWarning(zeon, ['foo','bar','baz','tmp','log','console','test','alert','temp'], 'is dev relic');
+			hasWarning(zeon, function(t){ return t.name == 2/*identifier*/; }, 'is dev relic');
 		}
 	);
-	test('weaker operator than neighbor',
-		'5+5*5; 5+5+5; (5+5)*5;',
+	test('multiple operators on same level',
+		'5+5*5; 5*5+5; 5+5+5; (5+5)*5; 5+(5*5);',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			hasWarning(zeon, ['+','*'], 'multiple operators on same level', 6);
 		}
 	);
 	test('useless multiple throw args',
@@ -883,15 +923,45 @@ new function(){ testgroup = 'Warnings';
 		}
 	);
 	test('unnecessary parentheses',
-		'delete(foo); void(foo);',
+		'typeof(x); throw(x); return(x); delete(x); new(x); void(x);',
 		function(zeon){
 			hasWarning(zeon, '(', 'unnecessary parentheses');
 		}
 	);
-	test('uninitialized value in loop',
-		'var x; while (x) x = 5; var y; while (5) alert(y); var z; while (5) z(); var a = 5; while (a) a = 5; var b = 5; while (5) alert(b); var c = 5; while (5) c();',
+	test('uninitialized value in loop (1)',
+		'var x; while (x) x = 5;',
 		function(zeon){
-			assert('has', (zeon.btree.filter(function(t){ return t.value == '==='; })[0].warnings||[]).indexOf('typeof always string') >= 0);
+			noWarning(zeon, 'x', 'uninitialized value in loop', 1);
+		}
+	);
+	test('uninitialized value in loop (2)',
+		'var y; for (;5;) alert(y);',
+		function(zeon){
+			noWarning(zeon, 'y', 'uninitialized value in loop', 1);
+		}
+	);
+	test('uninitialized value in loop (3)',
+		'var z; while (5) z();',
+		function(zeon){
+			noWarning(zeon, 'z', 'uninitialized value in loop');
+		}
+	);
+	test('uninitialized value in loop (4)',
+		'var a = 5; while (a) a = 5;',
+		function(zeon){
+			noWarning(zeon, 'a', 'uninitialized value in loop', 2);
+		}
+	);
+	test('uninitialized value in loop (5)',
+		'var b = 5; while (5) alert(b);',
+		function(zeon){
+			noWarning(zeon, '(', 'uninitialized value in loop', 1);
+		}
+	);
+	test('uninitialized value in loop (6)',
+		'var c = 5; while (5) c();',
+		function(zeon){
+			noWarning(zeon, 'c', 'uninitialized value in loop',1);
 		}
 	);
 	test('jsdoc mismatch',
@@ -944,9 +1014,9 @@ new function(){ testgroup = 'Warnings';
 		}
 	);
 	test('useless parens',
-		'(a);',
+		'(a); x = (t+z); (5 + 5) * 5;',
 		function(zeon){
-			hasWarning(zeon, '(', 'useless parens');
+			hasWarning(zeon, '(', 'useless parens', 2);
 		}
 	);
 	test('known implicit global',

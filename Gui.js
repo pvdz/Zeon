@@ -1338,8 +1338,13 @@ Gui.prototype = {
 		return value;
 	},
 	showWarnings: function(match){
-		if (!this.config[match.warning]) return;
-		switch (match.warning) {
+		// find the first warning that's not disabled
+		var warnings = match.warnings;
+		var i = 0;
+		while (warnings[i] && !this.config[warnings[i]]) ++i;
+		if (!warnings[i] || !this.config[warnings[i]]) return; // note, "undefined" is also a key so we cant just check if warnings[i] in this.config... :)
+
+		switch (warnings[i]) {
 			case 'missing block good':
 				this.bubble('{', match, {color:'black','background-color':'yellow'});
 				break;
@@ -1595,8 +1600,8 @@ Gui.prototype = {
 			case 'is dev relic':
 				this.bubble('d', match, {color:'white', 'background-color':'black'}, 12);
 				break;
-			case 'weaker operator than neighbor':
-				this.bubble('w', match, {color:'black','background-color':'yellow'});
+			case 'multiple operators on same level':
+				this.bubble('S', match, {color:'black','background-color':'yellow'});
 				break;
 			case 'useless multiple throw args':
 				this.bubble('a', match, {color:'black','background-color':'yellow'});

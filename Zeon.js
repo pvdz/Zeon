@@ -180,7 +180,7 @@ Zeon.getNewConfig = function(){
 		'pragma start missing end': true,
 		'macro name should be identifier': true,
 		'is dev relic': true,
-		'weaker operator than neighbor': true,
+		'multiple operators on same level': true,
 		'useless multiple throw args': true,
 		'unnecessary parentheses': true,
 		'uninitialized value in loop': true,
@@ -266,7 +266,7 @@ Zeon.prototype = {
 
 	regexEcma: /^Object$|^Array$|^String$|^Number$|^Boolean$|^Date$|^Function$|^RegExp$|^Error$|^arguments$|^Math$|^JSON$|^parseInt$|^parseFloat$|^isFinite$|^isNaN$|^undefined$|^eval$|^true$|^false$|^null$/,
 	regexBrowser: /^document$|^window$|^setTimeout$|^setInterval$|^clearInterval$|^clearTimeout$|^console$|^navigator$|^Image$|^alert$|^confirm$|^XMLHttpRequest$/,
-	regexDevSigns: /^console$|^log$|^debug$|^debugger$|^alert$|^foo$|^bar$|^boo$/,
+	regexDevSigns: /^console$|^log$|^debug$|^debugger$|^alert$|^foo$|^bar$|^baz$|^boo$|^tmp$|^temp$|^test$/,
 	regexBuiltinObjects: /^Object$|^Array$|^String$|^Number$|^Boolean$|^Date$|^Function$|^RegExp$|^Error$|^Math$|^JSON$/,
 	regexBuiltinBadConstructors: /^Object$|^Array$|^String$|^Number$|^Boolean$|^Function$|^RegExp$|^Error$|^Math$|^JSON$/,
 	regexBinaryOps: /^\&$|^\|$|^\^$|^\~$|^<<$|^>>$|^>>>$/,
@@ -1370,21 +1370,23 @@ Zeon.prototype = {
 		if (stack.desc == 'expression') {
 			// scan all operators. remember the most important one.
 			// if same level, keep left-most (even for assignments)
-
 			while (stack.length % 2 == 1 && stack.length > 3 && stack[1].isBinaryOperator) {
 				var minTarget = 1;
+				stack[1][0].isAmbiguous = true;
 				var minValue = this.precedence[stack[1].sub];
 				var n = 3;
+				var wasLess = false;
 				while (n < stack.length-1) {
+					stack[n][0].isAmbiguous = true;
 					var curValue = this.precedence[stack[n].sub];
 					if (curValue < minValue || (curValue == minValue && (stack[n].isAssignment || stack[n].sub == '?' || stack[n].sub == ':'))) {
 						minValue = curValue;
 						minTarget = n;
+						wasLess = true;
 					}
 					n += 2;
 				}
 
-				stack[minTarget][0].isAmbiguous = true;
 				// minTarget is now our next "cut"
 				// take the token directly left and right of the operator
 				var newExpr = [stack[minTarget-1], stack[minTarget], stack[minTarget+1]];
@@ -1542,7 +1544,6 @@ Zeon.prototype = {
 							this.setTypeToRef(prev, 'Function');
 						}
 					} else if (next.value == 'prototype') {
-
 						// mark prev as constructor
 						if (!prev.isConstructor) {
 							// the only reason to mess with prototype is to change a constructor or
@@ -1551,7 +1552,7 @@ Zeon.prototype = {
 							prev.isConstructor = true;
 							prev.constructorName = prev.value; // TOFIX: this is not quite correct yet
 						}
-						if (prev.trackingObject && prev.trackingObject.isConstructor) {
+						if (prev.trackingObject && !prev.trackingObject.isConstructor) {
 							// the only reason to mess with prototype is to change a constructor or
 							// to copy the prototype of another constructor. either way, you're
 							// very very likely to only take that property of a constructor.
@@ -1995,9 +1996,9 @@ Zeon.prototype = {
 		var seenIn = false;
 		var deleteToken = null;
 		stack.forEach(function(token, i){
-			if (stack.sub == 'block' && token.sub == 'block' && stack.statements == 1) this.addWarning(this.btree[stack.nextBlack], 'double block');
-			else if ((stack.root || stack.desc == 'func body') && token.sub == 'block') this.addWarning(this.btree[token.nextBlack], 'useless block');
-
+			if (stack.sub == 'block' && token.sub == 'block') this.addWarning(this.btree[stack.nextBlack], 'double block');
+			else if ((stack.root || stack.desc == 'func body' || stack.sub == 'block') && token.sub == 'block') this.addWarning(this.btree[token.nextBlack], 'useless block');
+			
 			// statement headers are not wrapped in own group (maybe they ought to be..)
 			if (token.statementHeaderStart && stack.forType != 'each') _insideConditional = true;
 			else if (token.statementHeaderStop) _insideConditional = false;
@@ -2872,7 +2873,7 @@ Zeon.prototype = {
 
 			if (stack[i+2]) {
 				var testForOp = this.btree[stack[i+1].nextBlack];
-				if (testForOp && testForOp.name == 11/*PUNCTUATOR*/) {
+				if (testForOp) {
 					testForOp.typeofOperator = true;
 					switch (testForOp.value) {
 						case '===':
@@ -3559,7 +3560,9 @@ Zeon.prototype = {
 			// crock hates short
 			if (token.value == '--' || token.value == '++') {
 				if (prev.isCallExpressionStop) this.addWarning(token, 'cannot inc/dec on call expression');
-				else if (next && next.value == 'new') this.addWarning(token, 'inc/dec only valid on vars');
+				else if (next && next.valueType == 'call') this.addWarning(token, 'cannot inc/dec on call expression');
+				// check if prev/next is primitive. dont worry about line terminators, semi's or ASI are part of the btree.
+				else if ((next && (next.value == 'new' || next.isPrimitive)) || prev.isPrimitive) this.addWarning(token, 'inc/dec only valid on vars');
 				else if (prev && prev.isGroupStop && prev.twin.numberOfExpressions > 1) {
 					this.addWarning(token, 'comma in group makes inc/dec fail');
 				}
@@ -3617,7 +3620,7 @@ Zeon.prototype = {
 				if (token.value == ',' && next && (next.value == ']' || next.value == '}')) this.addWarning(token, 'trailing comma');
 			}
 			// there's a stronger operator on the same level as this one...
-			if (token.isAmbiguous) this.addWarning(token, 'weaker operator than neighbor');
+			if (token.isAmbiguous) this.addWarning(token, 'multiple operators on same level');
 			// we want to warn for empty statements
 			if (token.emptyStatement) this.addWarning(token, 'empty statement');
 		}
@@ -3697,8 +3700,8 @@ Zeon.prototype = {
 			// were there any other types found than those declared by jsdoc?
 			if (token.jsdocIncomplete) this.addWarning(token, 'jsdoc type mismatch');
 			// using parentheses in silly places
-			if ((token.value == 'throw' || token.value == 'delete' || token.value == 'new') && next && next.value == '(') {
-				this.addWarning(token, 'unnecessary parentheses');
+			if ((token.value == 'typeof' || token.value == 'throw' || token.value == 'return' || token.value == 'delete' || token.value == 'new' || token.value == 'void') && next && next.value == '(') {
+				this.addWarning(next, 'unnecessary parentheses');
 			}
 
 			// using uninitialized variable in loop
@@ -3774,7 +3777,7 @@ Zeon.prototype = {
 			if (this.regexInvalidHexEscape.test(token.value)) this.addWarning(token, 'invalid hex escape in string');
 		} else if (token.isComment) {
 			// probably only bad for multi-line comment. but warn regardless.
-			if (token.value.indexOf('/*',1) > 0 || token.value.indexOf('*/',1) > 0) this.addWarning(token, 'nested comment');
+			if (token.value.indexOf('/*',1) > 0 || (token.name == 7/*COMMENT_SINGLE*/ && token.value.indexOf('*/',1) > 0)) this.addWarning(token, 'nested comment');
 		}
 
 		// ### end warning stuff
