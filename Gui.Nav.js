@@ -950,8 +950,8 @@ setTimeout(function(){
 					var code = false;
 					while (!code) {
 						try {
-							if (true) var code = crapFuzzer();
-							else switch (Math.floor(Math.round()*4)) {
+							var next = Math.floor(Math.random()*4);
+							switch (next) {
 								case 0: 
 									var code = fuzzRuderManOrg(19);
 									break;
@@ -986,7 +986,7 @@ setTimeout(function(){
 							setTimeout(function(){ console.log(screwed); },10);
 						}
 					}
-				}.bind(this), 1);
+				}.bind(this), 10);
 			}
 		}.bind(this);
 		this.toolMenu.appendChild(this.fuzzButton);
