@@ -1376,7 +1376,7 @@ Zeon.prototype = {
 				var minValue = this.precedence[stack[1].sub];
 				var n = 3;
 				var wasLess = false;
-				while (n < stack.length-1) {
+				while (n < stack.length-1 && stack[n][0]) { // check for stack[n][0] is because it might not exist if an error was thrown.
 					stack[n][0].isAmbiguous = true;
 					var curValue = this.precedence[stack[n].sub];
 					if (curValue < minValue || (curValue == minValue && (stack[n].isAssignment || stack[n].sub == '?' || stack[n].sub == ':'))) {
@@ -2206,7 +2206,7 @@ Zeon.prototype = {
 		if (token.value == 'typeof') stack.hasTypeof = true;
 
 		// if you declare a function param or catch scope param with single underscore, no error is given, its assuming you want that to be empty
-		if (token.varNameDecl && !token.trackingObject.used && ((token.meta != 'parameter' && !token.isCatchVar) || token.value != '_')) { // since it was declared, it should exist in the scope.
+		if (token.varNameDecl && token.trackingObject && !token.trackingObject.used && ((token.meta != 'parameter' && !token.isCatchVar) || token.value != '_')) { // since it was declared, it should exist in the scope.
 			token.unused = true;
 		}
 
@@ -3811,7 +3811,7 @@ Zeon.prototype = {
 				rest = rest.filter(function(token){
 					var isFunction = token.isFuncExprKeyword || token.isFuncDeclKeyword;
 					var to = token.trackingObject;
-					var typerefs = (isFunction?token.typeRefs:to.typeRefs);
+					var typerefs = (isFunction?token.typeRefs:to&&to.typeRefs);
 	
 					if (typerefs) {
 						typerefs = typerefs.filter(function(ref){
@@ -3906,7 +3906,7 @@ Zeon.prototype = {
 						if (isFunction) token.typeRefs = typerefs;
 						else to.typeRefs = typerefs;
 					}
-					return true;
+					return false;
 				},this);
 			}
 			
@@ -4128,10 +4128,11 @@ Zeon.prototype = {
 				}
 			}
 		}
-		console.log(["unhandled case", stack.desc, stack]);
+		if (!this.hasError) console.log(["unhandled case", stack.desc, stack]);
 	},
 
 	getType: function(stack){
+		if (this.hasError && !stack) return false; // can sometimes happen, ex: `[a.[`
 		if (stack.desc == 'expressions') return this.getTypeExpressions(stack);
 		else if (stack.desc == 'expression') return this.getTypeExpression(stack);
 		else if (stack.desc == 'sub-expression') return this.getTypeSubExpression(stack);
@@ -4323,7 +4324,10 @@ Zeon.prototype = {
 				else if (token.isArrayLiteralStart) lastType = token;
 				// return objlit stack
 				else if (token.isObjectLiteralStart) {
-					if (!token.definedProperties) throw 'no props?'; // even on an empty objlit this array should exist (albeit empty)
+					if (!token.definedProperties) {
+						if (this.hasError) return lastType; // happens for instance with: `d[{`
+						else throw 'no props?'; // even on an empty objlit this array should exist (albeit empty)
+					}
 					// return the token, that way we can bind a ref later (if we want to). just make sure this is not an array. 
 					// see addTypeToVarStack()
 					lastType = token;

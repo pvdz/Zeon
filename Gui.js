@@ -1063,6 +1063,8 @@ Gui.prototype = {
 			if (match.name == 14/*error*/) {
 				// show error before the trailing whitespace, rather than after. unless match.errorHasContent is true.
 				var prev = match.errorHasContent ? match : (this.zeon.btree[match.tokposb-1] || match);
+				while (prev && prev.name == 14/*error*/) prev = this.zeon.btree[prev.tokposb-1]; // prevents a possible error with prev.lineId not being defined
+				if (!prev) prev = match; // with errors, there might not be a black token at all...
 				this.showErrorMark(prev);
 
 				// for tokenizer errors, show the content anyways

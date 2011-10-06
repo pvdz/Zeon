@@ -1079,6 +1079,7 @@ ZeParser.prototype = {
 		// )
 		// statement
 		// [else statement]
+		var ifKeyword = match;
 		match = this.tokenizer.storeCurrentAndFetchNextToken(false, match, stack);
 		if (match.value != '(') match = this.failsafe('ExpectedStatementHeaderOpen', match);
 		if (this.ast) { //#ifdef FULL_AST
@@ -1104,6 +1105,7 @@ ZeParser.prototype = {
 
 		// match might be null here... (if the if-statement was end part of the source)
 		if (match && match.value == 'else') {
+			ifKeyword.hasElse = match;
 			match = this.eatElse(match, stack);
 		}
 

@@ -575,9 +575,7 @@ Gui.Nav.prototype = {
 		this.injectButton.onclick = function(_, testName){
 			Ast.injectName = testName || prompt('Enter name of function callback', 'callme') || 'callme';
 			var ast = new Ast(this.gui.zeon.tree, this.gui.zeon.btree); // this will be my new structure in the next iteration
-			// Ast.getHeatPlate()+
 			this.gui.setValue(ast.heatmap());
-			//this.beautifyButton.onclick();
 		}.bind(this);
 		this.toolMenu.appendChild(this.injectButton);
 	},
@@ -952,12 +950,16 @@ setTimeout(function(){
 					var code = false;
 					while (!code) {
 						try {
-							switch (Math.floor(Math.round()*3)) {
+							if (true) var code = crapFuzzer();
+							else switch (Math.floor(Math.round()*4)) {
 								case 0: 
 									var code = fuzzRuderManOrg(19);
 									break;
 								case 1: 
 									var code = fuzzRudermanMod(19);
+									break;
+								case 2:
+									var code = crapFuzzer();
 									break;
 								default: 
 									var code = fuzzZee();
@@ -981,7 +983,7 @@ setTimeout(function(){
 						screwed = null;
 					} finally {
 						if (screwed) {
-							setTimeout(function(){ console.log(screwed); });
+							setTimeout(function(){ console.log(screwed); },10);
 						}
 					}
 				}.bind(this), 1);
