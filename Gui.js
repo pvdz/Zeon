@@ -27,19 +27,6 @@ if (!Function.prototype.bind) {
 	};
 }
 
-// beautifier uses this
-if (!Number.prototype.tabs) {
-	Number.prototype.tabs = function(){
-		if (!Number.tabcache[this]) {
-			var s = '';
-			for (var i=0; i<this; ++i) s += '\t';
-			Number.tabcache[this] = s;
-		}
-		return Number.tabcache[this];
-	};
-	Number.tabcache = {};
-}
-
 var Gui = function(textarea){
 	this.textarea = textarea;
 

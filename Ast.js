@@ -1,3 +1,16 @@
+// beautifier uses this
+if (!Number.prototype.tabs) {
+	Number.prototype.tabs = function(){
+		if (!Number.tabcache[this]) {
+			var s = '';
+			for (var i=0; i<this; ++i) s += '\t';
+			Number.tabcache[this] = s;
+		}
+		return Number.tabcache[this];
+	};
+	Number.tabcache = {};
+}
+
 window.Ast = function(stack, list){
 	// for now, just return this custom object...
 	return this.generate(stack, list);
@@ -6,8 +19,6 @@ Ast.getHeatString = function(obj){
 	return Ast.injectName+'('+obj.listId+')';
 };
 Ast.injectName = 'callme';
-
-
 
 Ast.prototype = {
 
