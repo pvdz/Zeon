@@ -1,3 +1,8 @@
+if (typeof exports !== 'undefined') {
+	var Tokenizer = require('./tokenizer').Tokenizer;
+	exports.ZeParser = ZeParser;
+}
+
 /**
  * This is my js Parser: Ze. It's actually the post-dev pre-cleanup version. Clearly.
  * Some optimizations have been applied :)
@@ -6,7 +11,7 @@
  * @param {Tokenizer} tok
  * @param {Array} stack The tokens will be put in this array. If you're looking for the AST, this would be it :)
  */
-window.ZeParser = function(inp, tok, stack, simple){
+function ZeParser(inp, tok, stack, simple){
 	this.input = inp;
 	this.tokenizer = tok;
 	this.stack = stack;

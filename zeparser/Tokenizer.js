@@ -1,3 +1,8 @@
+if (typeof exports !== 'undefined') {
+	var Unicode = require('./unicodecategories').Unicode;
+	exports.Tokenizer = Tokenizer;
+}
+
 /*!
  * Tokenizer for JavaScript / ECMAScript 5
  * (c) Peter van der Zee, qfox.nl
@@ -6,7 +11,7 @@
 /**
  * @param {Object} inp
  */
-window.Tokenizer = function(inp){
+function Tokenizer(inp){
 	this.inp = inp||'';
 	// replace all other line terminators with \n (leave \r\n in tact though). we should probably remove the shadowInp when finished...
 	// only replace \r if it is not followed by a \n else \r\n would become \n\n causing a double newline where it is just a single
@@ -40,7 +45,7 @@ window.Tokenizer = function(inp){
 	this.tokenCount = 0;
 	this.tokenCountNoWhite = 0;
 	
-	this.Unicode = window.Unicode;
+	this.Unicode = Unicode;
 	
 	// if the Parser throws an error. it will set this property to the next match
 	// at the time of the error (which was not what it was expecting at that point) 
@@ -1015,7 +1020,7 @@ Tokenizer.regexIdentifierStop = /[\>\=\!\|\<\+\-\&\*\%\^\/\{\}\(\)\[\]\.\;\,\~\?
 Tokenizer.hashIdentifierStop = {'>':1,'=':1,'!':1,'|':1,'<':1,'+':1,'-':1,'&':1,'*':1,'%':1,'^':1,'/':1,'{':1,'}':1,'(':1,')':1,'[':1,']':1,'.':1,';':1,',':1,'~':1,'?':1,':':1,'\\':1,'\'':1,'"':1,' ':1,'\t':1,'\n':1};
 Tokenizer.regexNewline = /\n/g;
 //Tokenizer.regexPunctuators = /^(>>>=|===|!==|>>>|<<=|>>=|<=|>=|==|!=|\+\+|--|<<|>>|\&\&|\|\||\+=|-=|\*=|%=|\&=|\|=|\^=|\/=|\{|\}|\(|\)|\[|\]|\.|;|,|<|>|\+|-|\*|%|\||\&|\||\^|!|~|\?|:|=|\/)/;
-Tokenizer.Unidocde = window.Unicode;
+Tokenizer.Unidocde = Unicode;
 Tokenizer.regexNumber = /^(?:(0[xX][0-9A-Fa-f]+)|((?:(?:(?:(?:[0-9]+)(?:\.[0-9]*)?))|(?:\.[0-9]+))(?:[eE][-+]?[0-9]{1,})?))/;
 Tokenizer.regexNormalizeNewlines = /(\u000D[^\u000A])|[\u2028\u2029]/;
 
