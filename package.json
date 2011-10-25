@@ -2,7 +2,7 @@
   "author": "Peter van der Zee (http://qfox.nl/)",
   "name": "zeon",
   "description": "A static visual JavaScript analyzer / editor. This module only exports ZeParser at this point.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "http://zeonjs.com/",
   "repository": {
     "type": "git",
