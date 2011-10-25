@@ -1,6 +1,10 @@
 // http://qfox.nl/notes/90
 
-if (!window.Unicode) window.Unicode = {};
+if (typeof window !== 'undefined' && !window.Unicode) {
+	window.Unicode = {};
+} else if (typeof exports !== 'undefined') {
+	var Unicode = exports.Unicode = {};
+}
 
 // upper case
 // http://query.yahooapis.com/v1/public/yql?q=select%20content%20from%20html%20where%20url%3D%22http%3A%2F%2Fwww.fileformat.info%2Finfo%2Funicode%2Fcategory%2FLu%2Flist.htm%22%20and%20xpath%3D'%2F%2Fa'%20and%20href%20like%20'%2Finfo%2Funicode%2Fchar%2F%25'%20and%20href%20like%20'%25%2Findex.htm'&format=json&diagnostics=false&callback=cbfunc
