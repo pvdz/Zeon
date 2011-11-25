@@ -550,7 +550,9 @@ Zeon.prototype = {
 
 		var nodejs = [
 			['require','Function'],
-			['module','Object',['exports','Object']]
+			['module','Object',[
+				['exports','Object']
+			]]
 		];
 
 		// http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window
@@ -941,7 +943,7 @@ Zeon.prototype = {
 		};
 
 		browsers.forEach(function(o){ addGlobal(o, true); });
-		nodejs.forEach(function(o){ addGlobal(o); });
+		nodejs.forEach(function(o){ addGlobal(o, true); });
 		ecmas.forEach(function(o){ addGlobal(o); });
 	},
 
