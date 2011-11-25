@@ -548,6 +548,11 @@ Zeon.prototype = {
 		// this is not everything, just some more common ones. common dom apis, html5 apis, etc.
 		// http://code.google.com/p/closure-compiler/source/browse/#svn%2Ftrunk%2Fexterns
 
+		var nodejs = [
+			['require','Function'],
+			['module','Object',['exports','Object']]
+		];
+
 		// http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#window
 		var browsers = [
 			['window','Object',null,null,true],
@@ -936,6 +941,7 @@ Zeon.prototype = {
 		};
 
 		browsers.forEach(function(o){ addGlobal(o, true); });
+		nodejs.forEach(function(o){ addGlobal(o, true); });
 		ecmas.forEach(function(o){ addGlobal(o); });
 	},
 
