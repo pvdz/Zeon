@@ -941,7 +941,7 @@ Zeon.prototype = {
 		};
 
 		browsers.forEach(function(o){ addGlobal(o, true); });
-		nodejs.forEach(function(o){ addGlobal(o, true); });
+		nodejs.forEach(function(o){ addGlobal(o); });
 		ecmas.forEach(function(o){ addGlobal(o); });
 	},
 
