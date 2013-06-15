@@ -1,1 +1,5 @@
 Zeon is a static JavaScript analyzer.
+
+Live demo: http://qfox.github.com/Zeon/console.html
+
+Not really maintained, but feel free to add tickets or PRs :)
